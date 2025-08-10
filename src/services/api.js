@@ -21,6 +21,12 @@ class ApiService {
     });
   }
 
+   async deleteEntry(id) {
+    return this.request(`/entries/${id}`, {
+      method: 'DELETE'
+    });
+  }
+
   async searchEntries(query) {
     return this.request(`/search?q=${encodeURIComponent(query)}`);
   }

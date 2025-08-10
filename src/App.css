@@ -17,11 +17,16 @@
 }
 
 .chunky-title {
+  position: sticky;
   font-size: 3rem;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 2rem;
+  top: 0;
+  z-index: 100;
+  padding: 20px 0;
+  margin: 0 0 20px 0;
   color: #333;
+  background: white;
 }
 
 .cards-container {
@@ -97,9 +102,16 @@
 }
 
 .entry-text {
-  margin-bottom: 0.5rem;
+  margin-bottom: 10px;
   font-size: 1rem;
   line-height: 1.5;
+  padding-right: 80px; 
+}
+
+.entry-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .entry-date {
@@ -123,4 +135,20 @@
 .search-results {
   max-height: 300px;
   overflow-y: auto;
+}
+
+.delete-btn {
+  background: #ffffff;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  flex-shrink: 0;
 }

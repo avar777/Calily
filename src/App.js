@@ -41,6 +41,16 @@ function App() {
     }
   };
 
+  const handleEntryDeleted = (deletedEntryId) => {
+    setEntries(prevEntries => 
+      prevEntries.filter(entry => entry._id !== deletedEntryId)
+    );
+    
+    setSearchResults(prevResults => 
+      prevResults.filter(entry => entry._id !== deletedEntryId)
+    );
+  };
+
   const searchEntries = async (searchTerm) => {
     if (!searchTerm.trim()) {
       setSearchResults([]);
@@ -59,36 +69,42 @@ function App() {
     <div className="app">
       <div className="container">
         <h1 className="chunky-title">CALILY</h1>
-        
         {error && (
-          <div style={{ 
-            background: '#fee2e2', 
-            color: '#dc2626', 
-            padding: '1rem', 
-            borderRadius: '8px', 
+          <div style={{
+            background: '#fee2e2',
+            color: '#dc2626',
+            padding: '1rem',
+            borderRadius: '8px',
             marginBottom: '1rem',
             textAlign: 'center'
           }}>
             {error}
-            <button 
-              onClick={() => setError(null)} 
-              style={{ 
-                marginLeft: '1rem', 
-                background: 'none', 
-                border: 'none', 
-                color: '#dc2626', 
-                cursor: 'pointer' 
+            <button
+              onClick={() => setError(null)}
+              style={{
+                marginLeft: '1rem',
+                background: 'none',
+                border: 'none',
+                color: '#dc2626',
+                cursor: 'pointer'
               }}
             >
               ✕
             </button>
           </div>
         )}
-        
         <div className="cards-container">
           <EntryCard onAddEntry={addEntry} />
-          <TimelineCard entries={entries} loading={loading} />
-          <SearchCard onSearch={searchEntries} searchResults={searchResults} />
+          <TimelineCard 
+            entries={entries} 
+            loading={loading} 
+            onEntryDeleted={handleEntryDeleted} 
+          />
+          <SearchCard 
+            onSearch={searchEntries} 
+            searchResults={searchResults}
+            onEntryDeleted={handleEntryDeleted}
+          />
           <ChartCard entries={entries} />
           <ExportCard entries={entries} />
         </div>

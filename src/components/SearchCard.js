@@ -8,6 +8,11 @@ const SearchCard = ({ onSearch, searchResults }) => {
     onSearch(searchTerm);
   };
 
+  const handleClear = () => {
+    setSearchTerm('');
+    onSearch(''); 
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
@@ -17,18 +22,29 @@ const SearchCard = ({ onSearch, searchResults }) => {
     <div className="card">
       <h2 className="card-title">Search Your Journal</h2>
       <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          className="input-field"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search entries"
-        />
+        <div className="search-input-wrapper">
+          <input
+            type="text"
+            className="input-field search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search entries"
+          />
+          {(searchTerm || searchResults.length > 0) && (
+            <button 
+              type="button" 
+              className="clear-search-btn"
+              onClick={handleClear}
+              title="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
         <button type="submit" className="btn-primary">
           Search
         </button>
       </form>
-      
       <div className="search-results">
         {searchResults.length > 0 && (
           <div>

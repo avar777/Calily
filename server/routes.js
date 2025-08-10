@@ -2,21 +2,15 @@ const express = require('express');
 const router = express.Router();
 const { Entry } = require('./models');
 
-// GET /api/entries - Get all entries
 router.get('/entries', async (req, res) => {
   try {
-    const entries = await Entry.find()
-      .sort({ createdAt: -1 })
-      .limit(100); // Limit to last 100 entries for performance
-    
+    const entries = await Entry.find().sort({ createdAt: -1 }).limit(100);
     res.json(entries);
   } catch (error) {
-    console.error('Error fetching entries:', error);
     res.status(500).json({ error: 'Failed to fetch entries' });
   }
 });
 
-// POST /api/entries - Create new entry
 router.post('/entries', async (req, res) => {
   try {
     const { text } = req.body;
@@ -32,16 +26,10 @@ router.post('/entries', async (req, res) => {
     const savedEntry = await entry.save();
     res.status(201).json(savedEntry);
   } catch (error) {
-    console.error('Error creating entry:', error);
-    if (error.name === 'ValidationError') {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: 'Failed to create entry' });
-    }
+      res.status(500).json({ error: 'Failed to create entry' });    
   }
 });
 
-// GET /api/entries/:id - Get single entry
 router.get('/entries/:id', async (req, res) => {
   try {
     const entry = await Entry.findById(req.params.id);
@@ -52,12 +40,7 @@ router.get('/entries/:id', async (req, res) => {
     
     res.json(entry);
   } catch (error) {
-    console.error('Error fetching entry:', error);
-    if (error.name === 'CastError') {
-      res.status(400).json({ error: 'Invalid entry ID' });
-    } else {
       res.status(500).json({ error: 'Failed to fetch entry' });
-    }
   }
 });
 
@@ -82,18 +65,10 @@ router.put('/entries/:id', async (req, res) => {
 
     res.json(entry);
   } catch (error) {
-    console.error('Error updating entry:', error);
-    if (error.name === 'ValidationError') {
-      res.status(400).json({ error: error.message });
-    } else if (error.name === 'CastError') {
-      res.status(400).json({ error: 'Invalid entry ID' });
-    } else {
       res.status(500).json({ error: 'Failed to update entry' });
-    }
   }
 });
 
-// DELETE /api/entries/:id - Delete entry
 router.delete('/entries/:id', async (req, res) => {
   try {
     const entry = await Entry.findByIdAndDelete(req.params.id);
@@ -104,16 +79,11 @@ router.delete('/entries/:id', async (req, res) => {
     
     res.json({ message: 'Entry deleted successfully' });
   } catch (error) {
-    console.error('Error deleting entry:', error);
-    if (error.name === 'CastError') {
-      res.status(400).json({ error: 'Invalid entry ID' });
-    } else {
       res.status(500).json({ error: 'Failed to delete entry' });
-    }
   }
 });
 
-router.get('/entries/search', async (req, res) => {
+router.get('/search', async (req, res) => {
   try {
     const { q } = req.query;
     
@@ -124,55 +94,45 @@ router.get('/entries/search', async (req, res) => {
     const entries = await Entry.searchEntries(q.trim());
     res.json(entries);
   } catch (error) {
-    console.error('Error searching entries:', error);
     res.status(500).json({ error: 'Failed to search entries' });
   }
 });
 
 router.get('/stats', async (req, res) => {
   try {
-    const totalEntries = await Entry.countDocuments();
-    const today = new Date();
-    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const todayEntries = await Entry.countDocuments({
-      createdAt: { $gte: startOfToday }
-    });
-
-    const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const weekEntries = await Entry.countDocuments({
-      createdAt: { $gte: lastWeek }
-    });
-
     const tagAggregation = await Entry.aggregate([
       { $unwind: '$tags' },
       { $group: { _id: '$tags', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 10 }
     ]);
-
-    res.json({
-      totalEntries,
-      todayEntries,
-      weekEntries,
-      commonTags: tagAggregation
-    });
+    const chartData = tagAggregation.map(item => ({
+      symptom: item._id,
+      count: item.count
+    }));
+    res.json({ chartData });
   } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Failed to fetch statistics' });
+    res.status(500).json({ error: 'Failed to fetch stats' });
   }
 });
 
-router.get('/entries/export', async (req, res) => {
+router.get('/recent', async (req, res) => {
+  try {
+    const entries = await Entry.find().sort({ createdAt: -1 }).limit(5);
+    res.json(entries);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch recent entries' });
+  }
+});
+
+router.get('/export', async (req, res) => {
   try {
     const entries = await Entry.find().sort({ createdAt: -1 });
-    
-    res.json({
-      exportDate: new Date().toISOString(),
-      totalEntries: entries.length,
-      entries: entries
-    });
+    let exportText = entries.map(entry => 
+      `${entry.createdAt.toLocaleDateString()}: ${entry.text}`
+    ).join('\n\n');
+    res.json({ exportText });
   } catch (error) {
-    console.error('Error exporting entries:', error);
     res.status(500).json({ error: 'Failed to export entries' });
   }
 });

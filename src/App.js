@@ -11,7 +11,7 @@ import apiService from './services/api';
 function App() {
   const [entries, setEntries] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
-  const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -20,16 +20,13 @@ function App() {
 
   const fetchEntries = async () => {
     try {
-      setLoading(true);
       setError(null);
       const data = await apiService.getEntries();
-      setEntries(data || []); 
+      setEntries(data || []);
     } catch (error) {
       console.error('Error fetching entries:', error);
       setError('Failed to load entries. Please try again.');
-      setEntries([]); 
-    } finally {
-      setLoading(false);
+      setEntries([]);
     }
   };
 
@@ -59,7 +56,7 @@ function App() {
     }
     try {
       const results = await apiService.searchEntries(searchTerm);
-      setSearchResults(results || []); 
+      setSearchResults(results || []);
     } catch (error) {
       console.error('Error searching entries:', error);
       setError('Search failed. Please try again.');
@@ -72,21 +69,11 @@ function App() {
       <div className="container">
         <h1 className="chunky-title">CALILY</h1>
         {error && (
-          <div style={{
-            padding: '1rem',
-            borderRadius: '8px',
-            marginBottom: '1rem',
-            textAlign: 'center'
-          }}>
+          <div className="error-message">
             {error}
             <button
               onClick={() => setError(null)}
-              style={{
-                marginLeft: '1rem',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer'
-              }}
+              className="error-close-btn"
             >
               ✕
             </button>
@@ -96,13 +83,11 @@ function App() {
           <EntryCard onAddEntry={addEntry} />
           <TimelineCard
             entries={entries}
-            loading={loading}
             onEntryDeleted={handleEntryDeleted}
           />
           <SearchCard
             onSearch={searchEntries}
             searchResults={searchResults}
-            onEntryDeleted={handleEntryDeleted}
           />
           <ChartCard entries={entries} />
           <ExportCard entries={entries} />

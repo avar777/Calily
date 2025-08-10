@@ -21,7 +21,7 @@ class ApiService {
     });
   }
 
-   async deleteEntry(id) {
+  async deleteEntry(id) {
     return this.request(`/entries/${id}`, {
       method: 'DELETE'
     });
@@ -29,25 +29,6 @@ class ApiService {
 
   async searchEntries(query) {
     return this.request(`/search?q=${encodeURIComponent(query)}`);
-  }
-
-  async getStats() {
-    return this.request('/stats');
-  }
-
-  async getRecentEntries() {
-    return this.request('/recent');
-  }
-
-  async exportEntries() {
-    const data = await this.request('/export');
-    const blob = new Blob([data.exportText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'calily_export.txt';
-    a.click();
-    URL.revokeObjectURL(url);
   }
 }
 

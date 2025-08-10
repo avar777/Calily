@@ -5,6 +5,7 @@ import TimelineCard from './components/TimelineCard';
 import SearchCard from './components/SearchCard';
 import ExportCard from './components/ExportCard';
 import ChartCard from './components/ChartCard';
+import ThemePicker from './components/ThemePicker';
 import apiService from './services/api';
 
 function App() {
@@ -22,10 +23,11 @@ function App() {
       setLoading(true);
       setError(null);
       const data = await apiService.getEntries();
-      setEntries(data);
+      setEntries(data || []); 
     } catch (error) {
       console.error('Error fetching entries:', error);
       setError('Failed to load entries. Please try again.');
+      setEntries([]); 
     } finally {
       setLoading(false);
     }
@@ -42,11 +44,10 @@ function App() {
   };
 
   const handleEntryDeleted = (deletedEntryId) => {
-    setEntries(prevEntries => 
+    setEntries(prevEntries =>
       prevEntries.filter(entry => entry._id !== deletedEntryId)
     );
-    
-    setSearchResults(prevResults => 
+    setSearchResults(prevResults =>
       prevResults.filter(entry => entry._id !== deletedEntryId)
     );
   };
@@ -58,7 +59,7 @@ function App() {
     }
     try {
       const results = await apiService.searchEntries(searchTerm);
-      setSearchResults(results);
+      setSearchResults(results || []); 
     } catch (error) {
       console.error('Error searching entries:', error);
       setError('Search failed. Please try again.');
@@ -67,12 +68,11 @@ function App() {
 
   return (
     <div className="app">
+      <ThemePicker />
       <div className="container">
         <h1 className="chunky-title">CALILY</h1>
         {error && (
           <div style={{
-            background: '#fee2e2',
-            color: '#dc2626',
             padding: '1rem',
             borderRadius: '8px',
             marginBottom: '1rem',
@@ -85,7 +85,6 @@ function App() {
                 marginLeft: '1rem',
                 background: 'none',
                 border: 'none',
-                color: '#dc2626',
                 cursor: 'pointer'
               }}
             >
@@ -95,13 +94,13 @@ function App() {
         )}
         <div className="cards-container">
           <EntryCard onAddEntry={addEntry} />
-          <TimelineCard 
-            entries={entries} 
-            loading={loading} 
-            onEntryDeleted={handleEntryDeleted} 
+          <TimelineCard
+            entries={entries}
+            loading={loading}
+            onEntryDeleted={handleEntryDeleted}
           />
-          <SearchCard 
-            onSearch={searchEntries} 
+          <SearchCard
+            onSearch={searchEntries}
             searchResults={searchResults}
             onEntryDeleted={handleEntryDeleted}
           />

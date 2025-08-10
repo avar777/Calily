@@ -24,14 +24,30 @@ const ChartCard = ({ entries = [] }) => {
     }
 
     const symptomKeywords = [
-      'fatigue', 'joint pain', 'skin problems', 'rash', 'muscle aches',
-      'muscle weakness', 'fever', 'swollen glands', 'numbness', 'tingling',
-      'shortness of breath', 'chest pain', 'weight loss', 'weight gain',
-      'digestive issues', 'abdominal pain', 'bloating', 'nausea', 'vomiting',
-      'stiffness', 'swelling', 'inflammation', 'butterfly rash', 'dry patches',
-      'sores', 'chills', 'night sweats', 'headache', 'dizzy', 'tired',
-      'weak', 'pain', 'cramping', 'bowel changes', 'emotional',
-      'difficulty moving', 'lymph nodes', 'heat', 'redness', 'heartrate'
+      // Physical symptoms
+      'fatigue', 'tired', 'exhausted', 'weak', 'weakness', 'energy', 'drained',
+      'pain', 'ache', 'aches', 'sore', 'tender', 'burning', 'sharp pain', 'throbbing',
+      'joint pain', 'back pain', 'neck pain', 'muscle aches', 'muscle pain', 'stiffness',
+      'headache', 'migraine', 'dizzy', 'dizziness', 'lightheaded', 'vertigo',
+      'nausea', 'sick', 'queasy', 'vomiting', 'threw up', 'stomach ache',
+      'bloating', 'bloated', 'cramping', 'cramps', 'digestive', 'bowel',
+      'fever', 'hot', 'chills', 'cold', 'shivering', 'sweating', 'night sweats',
+      'swelling', 'swollen', 'inflammation', 'puffy', 'fluid retention',
+      'rash', 'itchy', 'itching', 'skin problems', 'dry skin', 'flare',
+      'shortness of breath', 'breathing', 'chest pain', 'chest tight',
+      'numbness', 'tingling', 'pins and needles', 'burning sensation',
+      'heartrate', 'heart racing', 'palpitations', 'irregular heartbeat',
+      'anxious', 'anxiety', 'worried', 'stress', 'stressed', 'overwhelmed',
+      'sad', 'depressed', 'down', 'emotional', 'crying', 'moody', 'irritable',
+      'brain fog', 'confused', 'forgetful', 'concentration', 'focus',
+      'restless', 'agitated', 'frustrated', 'angry', 'mood swings',
+      'walking', 'running', 'exercise', 'workout', 'gym', 'yoga', 'stretching',
+      'work', 'working', 'sitting', 'standing', 'driving', 'commute',
+      'sleep', 'sleeping', 'nap', 'rest', 'bed', 'insomnia', 'woke up',
+      'eating', 'meal', 'breakfast', 'lunch', 'dinner', 'cooking', 'food',
+      'medication', 'pills', 'treatment', 'doctor', 'appointment',
+      'weather', 'rain', 'cold weather', 'hot weather', 'humidity',
+      'family', 'friends', 'social', 'alone', 'busy', 'relaxing'
     ];
 
     const symptomCounts = {};

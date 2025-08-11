@@ -1,5 +1,14 @@
+/*
+ * Calily
+ * Mongoose definition with tagging and search
+ *
+ * Author: Ava Raper
+ * Version: 1.0
+ */
+
 const mongoose = require('mongoose');
 
+// This will define entry schema with validation and constraints
 const entrySchema = new mongoose.Schema({
   text: {
     type: String,
@@ -22,13 +31,13 @@ const entrySchema = new mongoose.Schema({
   }
 });
 
-entrySchema.index({ text: 'text' });
-entrySchema.index({ createdAt: -1 });
+entrySchema.index({ text: 'text' }); // full-tect search 
+entrySchema.index({ createdAt: -1 }); // sort by date
 
+// tagging system for health keywords
 entrySchema.pre('save', function(next) {
   this.updatedAt = new Date();
   const healthKeywords = [
-    // Physical symptoms
     'fatigue', 'tired', 'exhausted', 'weak', 'weakness', 'energy', 'drained',
     'pain', 'ache', 'aches', 'sore', 'tender', 'burning', 'sharp pain', 'throbbing',
     'joint pain', 'back pain', 'neck pain', 'muscle aches', 'muscle pain', 'stiffness',
@@ -53,19 +62,21 @@ entrySchema.pre('save', function(next) {
     'weather', 'rain', 'cold weather', 'hot weather', 'humidity',
     'family', 'friends', 'social', 'alone', 'busy', 'relaxing'
   ];
+  // search entry text for health keywords
   const textLower = this.text.toLowerCase();
   this.tags = healthKeywords.filter(keyword => textLower.includes(keyword));
   next();
 });
 
+// advance search across text and tags
 entrySchema.statics.searchEntries = function(searchTerm) {
-  const regex = new RegExp(searchTerm, 'i');
+  const regex = new RegExp(searchTerm, 'i'); // case search 
   return this.find({
     $or: [
-      { text: regex },
-      { tags: { $in: [regex] } }
+      { text: regex }, // search in entry text
+      { tags: { $in: [regex] } } // search in tags 
     ]
-  }).sort({ createdAt: -1 });
+  }).sort({ createdAt: -1 }); // sort by newest to last
 };
 
 const Entry = mongoose.model('Entry', entrySchema);

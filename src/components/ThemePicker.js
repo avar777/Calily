@@ -1,8 +1,18 @@
+/*
+ * Calily
+ * Theme picker component using CSS variables for dynamic styling
+ *
+ * Author: Ava Raper
+ * Version: 1.0
+ */
+
 import React, { useState, useEffect } from 'react';
 
 const ThemePicker = () => {
+  // state to control dropdown visibility
   const [showPicker, setShowPicker] = useState(false);
   
+  // theme configuration using CSS variables 
   const themes = [
     {
       name: 'Default',
@@ -76,8 +86,10 @@ const ThemePicker = () => {
     }
   ];
 
+   // this will apply theme by setting CSS custom properties
   const applyTheme = (theme) => {
     const root = document.documentElement;
+    // set CSS variables
     root.style.setProperty('--primary-color', theme.primary);
     root.style.setProperty('--bg-color', theme.background);
     root.style.setProperty('--card-bg', theme.cardBg);
@@ -90,16 +102,19 @@ const ThemePicker = () => {
     root.style.setProperty('--chart-bar', theme.chartBar);
     root.style.setProperty('--entry-border', theme.entryBorder);
     
+    // notify other components of theme change
     window.dispatchEvent(new CustomEvent('themeChanged'));
     
     localStorage.setItem('calily-theme', JSON.stringify(theme));
     setShowPicker(false);
   };
 
+  // load saved theme
   useEffect(() => {
     const savedTheme = localStorage.getItem('calily-theme');
     if (savedTheme) {
       try {
+        // restore previously selected theme
         applyTheme(JSON.parse(savedTheme));
       } catch (error) {
         console.error('Error loading saved theme:', error);

@@ -1,3 +1,10 @@
+/*
+ * Calily
+ * Main stylesheet with CSS variables for dynamic theming
+ *
+ * Author: Ava Raper
+ * Version: 1.0
+ */
 :root {
   --primary-color: #000000;
   --bg-color: #ffffff;

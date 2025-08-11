@@ -1,18 +1,32 @@
+/*
+ * Calily
+ * Search functionality component with real-time results
+ *
+ * Author: Ava Raper
+ * Version: 1.0
+ */
+
 import React, { useState } from 'react';
 
 const SearchCard = ({ onSearch, searchResults }) => {
+  // state for search input
   const [searchTerm, setSearchTerm] = useState('');
 
+  // this will handle search form submission
   const handleSearch = (e) => {
     e.preventDefault();
+    // trigger search
     onSearch(searchTerm);
   };
 
+  // this will clear search results
   const handleClear = () => {
     setSearchTerm('');
+    // clear search
     onSearch(''); 
   };
 
+  // utility function for date formatting
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();

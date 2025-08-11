@@ -1,12 +1,24 @@
+/*
+ * Calily
+ * Entry creation component for symptom journaling
+ *
+ * Author: Ava Raper
+ * Version: 1.0
+ */
+
 import React, { useState } from 'react';
 
 const EntryCard = ({ onAddEntry }) => {
+  // state for entry text input
   const [entryText, setEntryText] = useState('');
 
+  // this will handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (entryText.trim()) {
+      // send entry to parent component
       onAddEntry(entryText.trim());
+      // clear input after submission
       setEntryText('');
     }
   };

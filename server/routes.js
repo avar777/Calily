@@ -1,7 +1,15 @@
+/*
+ * Calily
+ * API routes for entry management and data operations
+ *
+ * Author: Ava Raper
+ * Version: 1.0
+ */
 const express = require('express');
 const router = express.Router();
 const { Entry } = require('./models');
 
+// this will get - all entries periodical
 router.get('/entries', async (req, res) => {
   try {
     const entries = await Entry.find().sort({ createdAt: -1 }).limit(100);
@@ -11,12 +19,13 @@ router.get('/entries', async (req, res) => {
   }
 });
 
+// this will post - creates new entry with validation
 router.post('/entries', async (req, res) => {
   try {
     const { text } = req.body;
     
     if (!text || !text.trim()) {
-      return res.status(400).json({ error: 'Entry text is required' });
+      return res.status(400).json({ error: 'Entry text is required' }); // triggers tagging 
     }
 
     const entry = new Entry({
@@ -30,6 +39,7 @@ router.post('/entries', async (req, res) => {
   }
 });
 
+// this will get - single entry by ID
 router.get('/entries/:id', async (req, res) => {
   try {
     const entry = await Entry.findById(req.params.id);
@@ -44,7 +54,7 @@ router.get('/entries/:id', async (req, res) => {
   }
 });
 
-// PUT /api/entries/:id - Update entry
+// this will put - update existing entry
 router.put('/entries/:id', async (req, res) => {
   try {
     const { text } = req.body;
@@ -69,6 +79,7 @@ router.put('/entries/:id', async (req, res) => {
   }
 });
 
+// this will delete - entry by ID
 router.delete('/entries/:id', async (req, res) => {
   try {
     const entry = await Entry.findByIdAndDelete(req.params.id);
@@ -83,6 +94,7 @@ router.delete('/entries/:id', async (req, res) => {
   }
 });
 
+// this will get - search entries by text/tags
 router.get('/search', async (req, res) => {
   try {
     const { q } = req.query;
@@ -91,20 +103,22 @@ router.get('/search', async (req, res) => {
       return res.status(400).json({ error: 'Search query is required' });
     }
 
-    const entries = await Entry.searchEntries(q.trim());
+    const entries = await Entry.searchEntries(q.trim()); // use made static method
     res.json(entries);
   } catch (error) {
     res.status(500).json({ error: 'Failed to search entries' });
   }
 });
 
+// this will get - symptom frequency data for bar chart
 router.get('/stats', async (req, res) => {
   try {
+    // use mongoDB for frequency analysis
     const tagAggregation = await Entry.aggregate([
-      { $unwind: '$tags' },
-      { $group: { _id: '$tags', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 10 }
+      { $unwind: '$tags' }, // seperate each tag
+      { $group: { _id: '$tags', count: { $sum: 1 } } }, // count 
+      { $sort: { count: -1 } }, // sort 
+      { $limit: 10 } // top 10 
     ]);
     const chartData = tagAggregation.map(item => ({
       symptom: item._id,
@@ -116,6 +130,7 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// this will get- the recent entries
 router.get('/recent', async (req, res) => {
   try {
     const entries = await Entry.find().sort({ createdAt: -1 }).limit(5);
@@ -125,6 +140,7 @@ router.get('/recent', async (req, res) => {
   }
 });
 
+// this will get - to export all entries as .txt
 router.get('/export', async (req, res) => {
   try {
     const entries = await Entry.find().sort({ createdAt: -1 });

@@ -1,17 +1,30 @@
+/*
+ * Calily
+ * Data export component for downloading journal entries
+ *
+ * Author: Ava Raper
+ * Version: 1.0
+ */
+
 import React from 'react';
 
 const ExportCard = ({ entries }) => {
+  // this will export entries to text file
   const exportToText = () => {
+    // format each entry with date and time
     const textData = entries.map(entry => {
       const date = new Date(entry.createdAt).toLocaleDateString();
       const time = new Date(entry.createdAt).toLocaleTimeString();
       return `${date} ${time}: ${entry.text}`;
     }).join('\n\n');
 
+    // create export summary
     const summary = `CALILY JOURNAL EXPORT: ${new Date().toLocaleDateString()}\nTotal Entries: ${entries.length}\n\n${textData}`;
 
+    // create downloadable blob
     const dataBlob = new Blob([summary], { type: 'text/plain' });
     const url = URL.createObjectURL(dataBlob);
+    // trigger download
     const link = document.createElement('a');
     link.href = url;
     link.download = `calily-export-${new Date().toISOString().split('T')[0]}.txt`;

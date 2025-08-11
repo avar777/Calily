@@ -58,32 +58,32 @@ The app will be available at `http://localhost:3000`
 ### 1. Daily Health Journaling
 Create and manage health entries with symptoms, mood, and notes.
 
-![Journal Entry](screenshots/journal-entry.png)
+<img src="screenshots/journal-entry.png" alt="Journal Entry" width="200" align="center">
 
 ### 2. Recent Entries Timeline
 View your most recent health entries.
 
-![Main App](screenshots/main-app.png)
+<img src="screenshots/main-app.png" alt="Journal Entry" width="200" align="center">
 
 ### 3. Search Historical Data
 Search through all your health entries by date range or keywords.
 
-![Search Feature](screenshots/search-feature.png)
+<img src="screenshots/search-feature.png" alt="Journal Entry" width="200" align="center">
 
 ### 4. Data Visualization
 Interactive D3.js charts showing symptom frequency over time.
 
-![Symptom Chart](screenshots/symptom-chart.png)
+<img src="screenshots/symptom-chart.png" alt="Journal Entry" width="200" align="center">
 
 ### 5. Export Health Data
 Export your health data to text files for Doctors.
 
-![Export Feature](screenshots/export-feature.png)
+<img src="screenshots/export-feature.png" alt="Journal Entry" width="200" align="center">
 
 ### 6. Theme Customization
 Choose from 5 different themes.
 
-![Moody Theme](screenshots/moody-theme.png)
+<img src="screenshots/moody-theme.png" alt="Journal Entry" width="200" align="center">
 
 ## Feature Documentation
 

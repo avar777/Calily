@@ -1,70 +1,159 @@
-# Getting Started with Create React App
+# Calily - Health Journaling App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack web application designed to help people with autoimmune diseases track and manage their symptoms.
 
-## Available Scripts
+## App Description and Purpose
 
-In the project directory, you can run:
+Calily helps people with autoimmune diseases monitor symptoms, identify patterns, and manage their health data effectively. The app provides a simple platform for daily health journaling.
 
-### `npm start`
+## Demo Video
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+📹 **[Watch the Full Demo Video (1:51)](videos/calily-demo.mp4)**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Installation and Setup Instructions
 
-### `npm test`
+**Prerequisites:** Node.js and MongoDB must be installed on your system.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Quick Start
 
-### `npm run build`
+```bash
+# Clone the repository
+git clone https://github.com/avar777/Calily.git
+cd Calily
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Install frontend dependencies
+npm install
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# Install backend dependencies
+cd server
+npm install
+cd ..
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+# Start MongoDB service
+# Command depends on users OS
 
-### `npm run eject`
+# Start the backend server (Terminal 1)
+cd server
+node server.js
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+# Start the React development server (Terminal 2)
+npm start
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The app will be available at `http://localhost:3000`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Technology Stack
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Frontend
+- React 18 (with hooks)
+- D3.js for the charts
+- CSS variables for themes
 
-## Learn More
+### Backend
+- Node.js and Express
+- MongoDB with Mongoose
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Features with Screenshots
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 1. Daily Health Journaling
+Create and manage health entries with symptoms, mood, and notes.
 
-### Code Splitting
+![Journal Entry](screenshots/journal-entry.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 2. Recent Entries Timeline
+View your most recent health entries.
 
-### Analyzing the Bundle Size
+![Main App](screenshots/main-app.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 3. Search Historical Data
+Search through all your health entries by date range or keywords.
 
-### Making a Progressive Web App
+![Search Feature](screenshots/search-feature.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 4. Data Visualization
+Interactive D3.js charts showing symptom frequency over time.
 
-### Advanced Configuration
+![Symptom Chart](screenshots/symptom-chart.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### 5. Export Health Data
+Export your health data to text files for Doctors.
 
-### Deployment
+![Export Feature](screenshots/export-feature.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 6. Theme Customization
+Choose from 5 different themes.
 
-### `npm run build` fails to minify
+![Moody Theme](screenshots/moody-theme.png)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Feature Documentation
+
+### Currently Working Features
+- Creating, editing, and deleting journal entries
+- Automatic keyword detection 
+- D3.js charts that update when new data comes in
+- Search that looks through both text and auto-generated tags
+- All 5 themes save your preference
+- Responsive design (works on phones)
+- Data export feature
+
+### Known Limitations
+- Only works for one user (no login system yet)
+- Uses local MongoDB (not hosted anywhere)
+- Entries are limited to 1000 characters
+- Only exports to .txt files
+- Search is case-sensitive
+
+### Future Features
+- User authentication so multiple people could use it
+- Deploy it to the cloud so people could actually use it
+- Mobile app version
+- More chart types
+- Medication tracking
+- Better export options (PDF, CSV)
+
+## API Documentation
+
+### Base URL
+```
+http://localhost:5000/api
+```
+
+### Endpoints
+
+#### Entry Management
+- **GET** `/entries` - Retrieve all health entries (last 100, sorted by date)
+- **POST** `/entries` - Create a new health entry
+- **GET** `/entries/:id` - Get a specific entry by ID
+- **PUT** `/entries/:id` - Update an existing entry
+- **DELETE** `/entries/:id` - Delete an entry
+
+#### Search & Analytics
+- **GET** `/search?q={query}` - Search entries by text or tags
+- **GET** `/stats` - Get symptom frequency data for charts
+- **GET** `/recent` - Get 5 most recent entries
+- **GET** `/export` - Export all entries as formatted text
+
+### Data Format
+```json
+{
+  "_id": "ObjectId",
+  "text": "Had joint pain and fatigue today. Took medication.",
+  "tags": ["joint pain", "fatigue", "medication"],
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+### Auto-Tagging System
+The app automatically tags entries with health-related keywords including:
+- Physical symptoms (fatigue, pain, nausea, etc.)
+- Emotional states (anxious, sad, stressed, etc.)
+- Activities (exercise, work, sleep, etc.)
+- Treatments (medication, doctor visits, etc.)
+
+## Contact Information
+
+**Developer:** Ava Raper 
+**GitHub:** [@avar777](https://github.com/avar777)  
+**Repository:** [Calily](https://github.com/avar777/Calily)  
+**Email:** avar@vt.edu

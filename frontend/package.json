@@ -2,7 +2,7 @@
   "name": "calily-frontend",
   "version": "1.0.0",
   "description": "Calily health journaling app frontend",
-  "homepage": "https://avar777.github.io/calily",
+  "homepage": "https://avar777.github.io/Calily",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

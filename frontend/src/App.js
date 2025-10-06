@@ -109,6 +109,10 @@ function App() {
             onSearch={searchEntries}
             searchResults={searchResults}
           />
+          <AIInsightsCard entries={entries} />
+          
+          <TimelineCard entries={entries} onEntryDeleted={handleEntryDeleted} />
+          <SearchCard onSearch={searchEntries} searchResults={searchResults} />
           <ChartCard entries={entries} />
           <ExportCard entries={entries} />
         </div>

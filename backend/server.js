@@ -28,6 +28,8 @@ const corsOptions = {
     ? [
         'https://avar777.github.io',
         'https://avar777.github.io/calily',
+        'https://calily-ihr63wim8-avar777s-projects.vercel.app',  // Add this
+        'https://calily.vercel.app',
         process.env.FRONTEND_URL
       ]
     : ['http://localhost:3000'],

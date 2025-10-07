@@ -36,6 +36,7 @@ const corsOptions = {
         'https://calily-ihr63wim8-avar777s-projects.vercel.app',
         'https://calily-1hvcz5hdc-avar777s-projects.vercel.app',  // Add new URL
         'https://calily.vercel.app',
+        'http://localhost:3000',
         /https:\/\/calily.*\.vercel\.app$/,
         process.env.FRONTEND_URL
       ]
@@ -205,23 +206,21 @@ const aiServiceBackend = {
 };
 
 // POST /api/ai/weekly-summary
-// Generate weekly summary from recent entries
+// Generate weekly summary from entries sent from frontend
 app.post('/api/ai/weekly-summary', async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { entries } = req.body;
 
-    // Get entries from last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const entries = await Entry.find({
-      userId: userId,
-      createdAt: { $gte: sevenDaysAgo }
-    }).sort({ createdAt: -1 });
+    if (!entries || entries.length === 0) {
+      return res.json({
+        summary: "No entries logged this week.",
+        entryCount: 0
+      });
+    }
 
     const summary = await aiServiceBackend.generateWeeklySummary(entries);
-
     res.json(summary);
+    
   } catch (error) {
     console.error('Error generating weekly summary:', error);
     res.status(500).json({ error: 'Failed to generate summary' });
@@ -229,19 +228,21 @@ app.post('/api/ai/weekly-summary', async (req, res) => {
 });
 
 // POST /api/ai/analyze-patterns
-// Analyze health patterns from all entries
+// Analyze health patterns from entries sent from frontend
 app.post('/api/ai/analyze-patterns', async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { entries } = req.body;
 
-    // Get all entries for the user
-    const entries = await Entry.find({ userId: userId })
-      .sort({ createdAt: -1 })
-      .limit(50);
+    if (!entries || entries.length < 5) {
+      return res.json({
+        patterns: [],
+        message: "Need at least 5 entries to identify patterns."
+      });
+    }
 
     const analysis = await aiServiceBackend.analyzePatterns(entries);
-
     res.json(analysis);
+    
   } catch (error) {
     console.error('Error analyzing patterns:', error);
     res.status(500).json({ error: 'Failed to analyze patterns' });
@@ -249,119 +250,24 @@ app.post('/api/ai/analyze-patterns', async (req, res) => {
 });
 
 // POST /api/ai/identify-triggers
-// Identify potential health triggers
+// Identify potential health triggers from entries sent from frontend
 app.post('/api/ai/identify-triggers', async (req, res) => {
   try {
-    const { userId } = req.body;
+    const { entries } = req.body;
 
-    // Get recent entries
-    const entries = await Entry.find({ userId: userId })
-      .sort({ createdAt: -1 })
-      .limit(50);
+    if (!entries || entries.length < 10) {
+      return res.json({
+        triggers: [],
+        message: "Need at least 10 entries to identify triggers."
+      });
+    }
 
     const triggers = await aiServiceBackend.identifyTriggers(entries);
-
     res.json(triggers);
+    
   } catch (error) {
     console.error('Error identifying triggers:', error);
     res.status(500).json({ error: 'Failed to identify triggers' });
-  }
-});
-
-// POST /api/ai/ask-question
-// Answer natural language questions about health data
-app.post('/api/ai/ask-question', async (req, res) => {
-  try {
-    const { userId, question } = req.body;
-
-    if (!question || question.trim() === '') {
-      return res.status(400).json({ error: 'Question is required' });
-    }
-
-    // Get recent entries for context
-    const entries = await Entry.find({ userId: userId })
-      .sort({ createdAt: -1 })
-      .limit(20);
-
-    const recentEntries = entries.map(e => {
-      const date = new Date(e.createdAt).toLocaleDateString();
-      return `${date}: ${e.text}`;
-    }).join('\n');
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: 'You answer questions about a user\'s health journal. Use their data to provide specific answers. Never diagnose or provide medical advice.'
-        },
-        {
-          role: 'user',
-          content: `Question: "${question}"\n\nRecent entries:\n${recentEntries}`
-        }
-      ],
-      max_tokens: 300,
-      temperature: 0.7
-    });
-
-    res.json({
-      question: question,
-      answer: completion.choices[0].message.content,
-      entriesReferenced: entries.length,
-      generatedAt: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Error answering question:', error);
-    res.status(500).json({ error: 'Failed to answer question' });
-  }
-});
-
-// POST /api/ai/doctor-prep
-// Generate doctor visit preparation summary
-app.post('/api/ai/doctor-prep', async (req, res) => {
-  try {
-    const { userId } = req.body;
-
-    // Get recent entries (last 2 weeks)
-    const twoWeeksAgo = new Date();
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
-
-    const entries = await Entry.find({
-      userId: userId,
-      createdAt: { $gte: twoWeeksAgo }
-    }).sort({ createdAt: -1 }).limit(15);
-
-    const recentEntries = entries.map(e => {
-      const date = new Date(e.createdAt).toLocaleDateString();
-      return `${date}: ${e.text}`;
-    }).join('\n');
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: 'You help prepare concise, professional summaries for doctor appointments. Focus on key information healthcare providers need.'
-        },
-        {
-          role: 'user',
-          content: `Prepare a doctor visit summary from these entries:\n\n${recentEntries}\n\nInclude: brief status, key symptoms, questions for doctor.`
-        }
-      ],
-      max_tokens: 500,
-      temperature: 0.6
-    });
-
-    res.json({
-      summary: completion.choices[0].message.content,
-      entriesIncluded: entries.length,
-      generatedAt: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Error preparing doctor visit summary:', error);
-    res.status(500).json({ error: 'Failed to generate summary' });
   }
 });
 

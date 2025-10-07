@@ -15,9 +15,9 @@ const openai = new OpenAI({
 });
 
 const app = express();
-const PORT = process.env.PORT || 10000; // Render uses port 10000
+const PORT = process.env.PORT || 10000;
 
-// MongoDB connection with your Atlas database
+// MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/calily';
 
 mongoose.connect(MONGODB_URI, {
@@ -27,14 +27,14 @@ mongoose.connect(MONGODB_URI, {
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-// CORS configuration for production
+// CORS configuration
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
         'https://avar777.github.io',
         'https://avar777.github.io/calily',
         'https://calily-ihr63wim8-avar777s-projects.vercel.app',
-        'https://calily-1hvcz5hdc-avar777s-projects.vercel.app',  // Add new URL
+        'https://calily-1hvcz5hdc-avar777s-projects.vercel.app',
         'https://calily.vercel.app',
         'http://localhost:3000',
         /https:\/\/calily.*\.vercel\.app$/,
@@ -49,7 +49,7 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Health check endpoint
+// Health check endpoints
 app.get('/', (req, res) => {
   res.json({ 
     status: 'Calily API is running', 
@@ -57,8 +57,6 @@ app.get('/', (req, res) => {
     environment: process.env.NODE_ENV 
   });
 });
-
-app.use('/api', routes);
 
 app.get('/health', (req, res) => {
   res.json({ 
@@ -69,21 +67,10 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
-});
+// Regular API routes
+app.use('/api', routes);
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Route not found' });
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
-});
-
+// AI Service Backend
 const aiServiceBackend = {
   async generateWeeklySummary(entries) {
     if (!entries || entries.length === 0) {
@@ -205,8 +192,7 @@ const aiServiceBackend = {
   }
 };
 
-// POST /api/ai/weekly-summary
-// Generate weekly summary from entries sent from frontend
+// AI Routes - MUST come before error handlers
 app.post('/api/ai/weekly-summary', async (req, res) => {
   try {
     const { entries } = req.body;
@@ -227,8 +213,6 @@ app.post('/api/ai/weekly-summary', async (req, res) => {
   }
 });
 
-// POST /api/ai/analyze-patterns
-// Analyze health patterns from entries sent from frontend
 app.post('/api/ai/analyze-patterns', async (req, res) => {
   try {
     const { entries } = req.body;
@@ -249,8 +233,6 @@ app.post('/api/ai/analyze-patterns', async (req, res) => {
   }
 });
 
-// POST /api/ai/identify-triggers
-// Identify potential health triggers from entries sent from frontend
 app.post('/api/ai/identify-triggers', async (req, res) => {
   try {
     const { entries } = req.body;
@@ -269,6 +251,22 @@ app.post('/api/ai/identify-triggers', async (req, res) => {
     console.error('Error identifying triggers:', error);
     res.status(500).json({ error: 'Failed to identify triggers' });
   }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// 404 handler - MUST be last route
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Start server - MUST be at the very end
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
 });
 
 module.exports = { aiServiceBackend };

@@ -14,6 +14,7 @@ import SearchCard from './components/SearchCard';
 import ExportCard from './components/ExportCard';
 import ChartCard from './components/ChartCard';
 import ThemePicker from './components/ThemePicker';
+import AIInsightsCard from './components/AICard';
 import apiService from './services/api';
 
 function App() {

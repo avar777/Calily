@@ -8,7 +8,7 @@
 const getApiBaseUrl = () => {
   if (process.env.NODE_ENV === 'production') {
     // Your Render backend URL (replace 'your-app-name' with actual Render service name)
-    return process.env.REACT_APP_API_URL || 'https://calily-backend.onrender.com/api';
+    return process.env.REACT_APP_API_URL || 'https://calily-api.onrender.com/api';
   }
   return 'http://localhost:5001/api';
 };

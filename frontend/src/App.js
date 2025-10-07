@@ -85,41 +85,38 @@ function App() {
   };
 
   return (
-    <div className="app">
-      <ThemePicker />
-      <div className="container">
-        <h1 className="chunky-title">CALILY</h1>
-        {error && (
-          <div className="error-message">
-            {error}
-            <button
-              onClick={() => setError(null)}
-              className="error-close-btn"
-            >
-              ✕
-            </button>
-          </div>
-        )}
-        <div className="cards-container">
-          <EntryCard onAddEntry={addEntry} />
-          <TimelineCard
-            entries={entries}
-            onEntryDeleted={handleEntryDeleted}
-          />
-          <SearchCard
-            onSearch={searchEntries}
-            searchResults={searchResults}
-          />
-          <AIInsightsCard entries={entries} />
-          
-          <TimelineCard entries={entries} onEntryDeleted={handleEntryDeleted} />
-          <SearchCard onSearch={searchEntries} searchResults={searchResults} />
-          <ChartCard entries={entries} />
-          <ExportCard entries={entries} />
+  <div className="app">
+    <ThemePicker />
+    <div className="container">
+      <h1 className="chunky-title">CALILY</h1>
+      {error && (
+        <div className="error-message">
+          {error}
+          <button
+            onClick={() => setError(null)}
+            className="error-close-btn"
+          >
+            ✕
+          </button>
         </div>
+      )}
+      <div className="cards-container">
+        <EntryCard onAddEntry={addEntry} />
+        <TimelineCard
+          entries={entries}
+          onEntryDeleted={handleEntryDeleted}
+        />
+        <SearchCard
+          onSearch={searchEntries}
+          searchResults={searchResults}
+        />
+        <AIInsightsCard entries={entries} />
+        <ChartCard entries={entries} />
+        <ExportCard entries={entries} />
       </div>
     </div>
-  );
+  </div>
+);
 }
 
 export default App;

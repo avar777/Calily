@@ -79,5 +79,49 @@ entrySchema.statics.searchEntries = function(searchTerm) {
   }).sort({ createdAt: -1 }); // sort by newest to last
 };
 
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
+  },
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Update Entry schema to include userId
+const entrySchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true  // Add this
+  },
+  text: {
+    type: String,
+    required: true
+  },
+  tags: [String],
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const Entry = mongoose.model('Entry', entrySchema);
-module.exports = { Entry };
+module.exports = { Entry, User };

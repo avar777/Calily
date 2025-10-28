@@ -16,33 +16,40 @@ const getApiBaseUrl = () => {
 const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
+  getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` })
+    };
+  }
   async request(endpoint, options = {}) {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        headers: { 
-          'Content-Type': 'application/json',
-        },
-        signal: controller.signal,
+        headers: this.getAuthHeaders(),
         ...options
       });
       
       clearTimeout(timeoutId);
       
+      if (response.status === 401) {
+        // Token expired or invalid
+        localStorage.removeItem('token');
+        window.location.href = '/auth';
+        return;
+      }
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(errorData.error || `HTTP ${response.status}`);
       }
       
       return response.json();
     } catch (error) {
-      if (error.name === 'AbortError') {
-        throw new Error('Request timeout. Please check your connection and try again.');
-      }
       console.error('API request failed:', error);
-      throw new Error(error.message || 'Network request failed. Please try again.');
+      throw error;
     }
   }
 

@@ -9,6 +9,8 @@ const cors = require('cors');
 const routes = require('./routes');
 require('dotenv').config();
 const OpenAI = require('openai');
+const authRoutes = require('./authRoutes');
+const authMiddleware = require('./authMiddleware');
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -48,6 +50,10 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use('/api/auth', authRoutes);
+// Protect existing routes with auth middleware
+app.use('/api/entries', authMiddleware);  // Add this line
+app.use('/api', authMiddleware);  // Protect all API routes
 
 // Health check endpoints
 app.get('/', (req, res) => {

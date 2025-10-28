@@ -9,6 +9,39 @@ const express = require('express');
 const router = express.Router();
 const { Entry } = require('./models');
 
+// GET all entries - only user's entries
+router.get('/entries', async (req, res) => {
+  try {
+    const entries = await Entry.find({ userId: req.userId })
+      .sort({ createdAt: -1 })
+      .limit(100);
+    res.json(entries);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch entries' });
+  }
+});
+
+// POST new entry - attach userId
+router.post('/entries', async (req, res) => {
+  try {
+    const { text } = req.body;
+    
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: 'Entry text is required' });
+    }
+
+    const entry = new Entry({
+      userId: req.userId,  // Add this
+      text: text.trim()
+    });
+
+    const savedEntry = await entry.save();
+    res.status(201).json(savedEntry);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create entry' });
+  }
+});
+
 // this will get - all entries periodical
 router.get('/entries', async (req, res) => {
   try {

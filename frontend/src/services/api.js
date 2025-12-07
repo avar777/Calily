@@ -2,12 +2,12 @@
  * Calily
  * API service layer for frontend-backend communication
  * Configured for Render backend deployment
+ * Updated with medication methods
  */
 
 // Determine API base URL based on environment
 const getApiBaseUrl = () => {
   if (process.env.NODE_ENV === 'production') {
-    // Your Render backend URL (replace 'your-app-name' with actual Render service name)
     return process.env.REACT_APP_API_URL || 'https://calily-api.onrender.com/api';
   }
   return 'http://localhost:5001/api';
@@ -23,10 +23,12 @@ class ApiService {
       ...(token && { 'Authorization': `Bearer ${token}` })
     };
   }
+
   async request(endpoint, options = {}) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         headers: this.getAuthHeaders(),
         ...options
@@ -35,7 +37,6 @@ class ApiService {
       clearTimeout(timeoutId);
       
       if (response.status === 401) {
-        // Token expired or invalid
         localStorage.removeItem('token');
         window.location.href = '/auth';
         return;
@@ -53,14 +54,32 @@ class ApiService {
     }
   }
 
+  // ===== JOURNAL ENTRIES =====
   async getEntries() {
     return this.request('/entries');
   }
 
-  async createEntry(text) {
+  async createEntry(text, image = null) {
+    const body = { text };
+    if (image) {
+      body.image = image;
+    }
     return this.request('/entries', {
       method: 'POST',
-      body: JSON.stringify({ text })
+      body: JSON.stringify(body)
+    });
+  }
+
+  async updateEntry(id, text, image = null, removeImage = false) {
+    const body = { text };
+    if (removeImage) {
+      body.removeImage = true;
+    } else if (image) {
+      body.image = image;
+    }
+    return this.request(`/entries/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(body)
     });
   }
 
@@ -72,6 +91,39 @@ class ApiService {
 
   async searchEntries(query) {
     return this.request(`/search?q=${encodeURIComponent(query)}`);
+  }
+
+  // ===== MEDICATIONS =====
+  async getMedications() {
+    return this.request('/medications');
+  }
+
+  async createMedication(medication) {
+    return this.request('/medications', {
+      method: 'POST',
+      body: JSON.stringify(medication)
+    });
+  }
+
+  // ENHANCED: Toggle specific dose (e.g., "2025-11-10-Morning")
+  async toggleMedicationDose(id, doseKey, taken) {
+    return this.request(`/medications/${id}/toggle-dose`, {
+      method: 'PUT',
+      body: JSON.stringify({ doseKey, taken })
+    });
+  } 
+
+  async toggleMedication(id, date, taken) {
+    return this.request(`/medications/${id}/toggle`, {
+      method: 'PUT',
+      body: JSON.stringify({ date, taken })
+    });
+  }
+
+  async deleteMedication(id) {
+    return this.request(`/medications/${id}`, {
+      method: 'DELETE'
+    });
   }
 }
 

@@ -14,6 +14,12 @@ const authMiddleware = (req, res, next) => {
     req.userId = decoded.userId;
     req.userEmail = decoded.email;
     
+    // Create req.user object for routes that expect it
+    req.user = {
+      _id: decoded.userId,
+      email: decoded.email
+    };
+    
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired token' });

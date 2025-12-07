@@ -8,13 +8,66 @@
 
 const mongoose = require('mongoose');
 
-// This will define entry schema with validation and constraints
+// User Schema
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
+  },
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  resetPasswordToken: {
+    type: String
+  },
+  resetPasswordExpires: {
+    type: Date
+  },
+  lastLogin: {
+    type: Date
+  },
+  loginAttempts: {
+    type: Number,
+    default: 0
+  },
+  lockUntil: {
+    type: Date
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Entry Schema with userId and validation
 const entrySchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   text: {
     type: String,
     required: [true, 'Entry text is required'],
     trim: true,
     maxlength: [1000, 'Entry cannot exceed 1000 characters']
+  },
+  image: {
+    data: String,  // Base64 encoded image data
+    contentType: String,  // Image MIME type (e.g., 'image/jpeg', 'image/png')
+    filename: String  // Original filename
   },
   tags: [{
     type: String,
@@ -31,8 +84,9 @@ const entrySchema = new mongoose.Schema({
   }
 });
 
-entrySchema.index({ text: 'text' }); // full-tect search 
+entrySchema.index({ text: 'text' }); // full-text search 
 entrySchema.index({ createdAt: -1 }); // sort by date
+entrySchema.index({ userId: 1, createdAt: -1 }); // user entries sorted by date
 
 // tagging system for health keywords
 entrySchema.pre('save', function(next) {
@@ -69,9 +123,10 @@ entrySchema.pre('save', function(next) {
 });
 
 // advance search across text and tags
-entrySchema.statics.searchEntries = function(searchTerm) {
-  const regex = new RegExp(searchTerm, 'i'); // case search 
+entrySchema.statics.searchEntries = function(searchTerm, userId) {
+  const regex = new RegExp(searchTerm, 'i'); // case insensitive search 
   return this.find({
+    userId: userId,  // Only search user's own entries
     $or: [
       { text: regex }, // search in entry text
       { tags: { $in: [regex] } } // search in tags 
@@ -79,49 +134,64 @@ entrySchema.statics.searchEntries = function(searchTerm) {
   }).sort({ createdAt: -1 }); // sort by newest to last
 };
 
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
-  },
-  name: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+const Entry = mongoose.model('Entry', entrySchema);
 
-const User = mongoose.model('User', userSchema);
-
-// Update Entry schema to include userId
-const entrySchema = new mongoose.Schema({
+// Medication Schema
+const medicationSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true  // Add this
-  },
-  text: {
-    type: String,
     required: true
   },
-  tags: [String],
+  name: {
+    type: String,
+    required: [true, 'Medication name is required'],
+    trim: true
+  },
+  dosage: {
+    type: String,
+    required: [true, 'Dosage is required'],
+    trim: true
+  },
+  frequency: {
+    type: String,
+    enum: ['Daily', 'Twice Daily', 'Three Times Daily', 'As Needed', 'Weekly'],
+    default: 'Daily'
+  },
+  timeOfDay: {
+    type: String,
+    enum: ['Morning', 'Afternoon', 'Evening', 'Bedtime', 'With Meals'],
+    default: 'Morning'
+  },
+  notes: {
+    type: String,
+    trim: true,
+    maxlength: [200, 'Notes cannot exceed 200 characters']
+  },
+  trackOnly: {
+    type: Boolean,
+    default: false  // false = show checkboxes, true = just list the med
+  },
+  takenDoses: [{
+    type: String  // Store as 'YYYY-MM-DD-Morning', 'YYYY-MM-DD-Evening', etc.
+  }],
   createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
     type: Date,
     default: Date.now
   }
 });
 
-const Entry = mongoose.model('Entry', entrySchema);
-module.exports = { Entry, User };
+medicationSchema.index({ userId: 1, createdAt: -1 }); // user medications sorted by date
+
+medicationSchema.pre('save', function(next) {
+  this.updatedAt = new Date();
+  next();
+});
+
+const Medication = mongoose.model('Medication', medicationSchema);
+
+module.exports = { Entry, User, Medication };

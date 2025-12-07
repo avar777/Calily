@@ -76,11 +76,38 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Check if account is locked
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      const minutesLeft = Math.ceil((user.lockUntil - Date.now()) / 60000);
+      return res.status(423).json({ 
+        error: `Account locked. Try again in ${minutesLeft} minute(s)` 
+      });
+    }
+
     // Check password
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
+      // Increment login attempts
+      user.loginAttempts = (user.loginAttempts || 0) + 1;
+      
+      // Lock account after 5 failed attempts for 15 minutes
+      if (user.loginAttempts >= 5) {
+        user.lockUntil = Date.now() + 15 * 60 * 1000; // 15 minutes
+        await user.save();
+        return res.status(423).json({ 
+          error: 'Too many failed login attempts. Account locked for 15 minutes' 
+        });
+      }
+      
+      await user.save();
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+
+    // Reset login attempts on successful login
+    user.loginAttempts = 0;
+    user.lockUntil = undefined;
+    user.lastLogin = new Date();
+    await user.save();
 
     // Generate token
     const token = jwt.sign(
@@ -95,7 +122,8 @@ router.post('/login', async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        lastLogin: user.lastLogin
       }
     });
   } catch (error) {
@@ -123,6 +151,131 @@ router.get('/me', async (req, res) => {
     res.json({ user });
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+// Request password reset
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Don't reveal if user exists for security
+      return res.json({ message: 'If an account exists, a password reset link has been sent' });
+    }
+
+    // Generate reset token (6-digit code for simplicity)
+    const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Hash the token before storing
+    const hashedToken = await bcrypt.hash(resetToken, 10);
+    
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    // In production, send this via email
+    // For now, we'll return it in the response (ONLY FOR DEVELOPMENT)
+    console.log(`Password reset token for ${email}: ${resetToken}`);
+    
+    res.json({ 
+      message: 'If an account exists, a password reset link has been sent',
+      // REMOVE THIS IN PRODUCTION - only for development
+      resetToken: resetToken
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ error: 'Failed to process request' });
+  }
+});
+
+// Reset password with token
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { email, token, newPassword } = req.body;
+
+    if (!email || !token || !newPassword) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    const user = await User.findOne({ 
+      email,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user || !user.resetPasswordToken) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+
+    // Verify the token
+    const validToken = await bcrypt.compare(token, user.resetPasswordToken);
+    if (!validToken) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
+// Change password (for logged-in users)
+router.post('/change-password', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: 'Current and new password required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters' });
+    }
+
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify current password
+    const validPassword = await bcrypt.compare(currentPassword, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+
+    // Hash and save new password
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Failed to change password' });
   }
 });
 

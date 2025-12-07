@@ -21,23 +21,40 @@ router.get('/entries', async (req, res) => {
   }
 });
 
-// POST new entry - attach userId
+// POST new entry - attach userId and handle image
 router.post('/entries', async (req, res) => {
   try {
-    const { text } = req.body;
+    const { text, image } = req.body;
     
     if (!text || !text.trim()) {
       return res.status(400).json({ error: 'Entry text is required' });
     }
 
-    const entry = new Entry({
-      userId: req.userId,  // Add this
+    const entryData = {
+      userId: req.userId,
       text: text.trim()
-    });
+    };
 
+    // Add image if provided
+    if (image && image.data) {
+      // Validate image size (limit to 5MB base64)
+      const base64Size = image.data.length * 0.75 / 1024 / 1024; // Convert to MB
+      if (base64Size > 5) {
+        return res.status(400).json({ error: 'Image size must be less than 5MB' });
+      }
+
+      entryData.image = {
+        data: image.data,
+        contentType: image.contentType || 'image/jpeg',
+        filename: image.filename || 'photo.jpg'
+      };
+    }
+
+    const entry = new Entry(entryData);
     const savedEntry = await entry.save();
     res.status(201).json(savedEntry);
   } catch (error) {
+    console.error('Error creating entry:', error);
     res.status(500).json({ error: 'Failed to create entry' });
   }
 });
@@ -49,26 +66,6 @@ router.get('/entries', async (req, res) => {
     res.json(entries);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch entries' });
-  }
-});
-
-// this will post - creates new entry with validation
-router.post('/entries', async (req, res) => {
-  try {
-    const { text } = req.body;
-    
-    if (!text || !text.trim()) {
-      return res.status(400).json({ error: 'Entry text is required' }); // triggers tagging 
-    }
-
-    const entry = new Entry({
-      text: text.trim()
-    });
-
-    const savedEntry = await entry.save();
-    res.status(201).json(savedEntry);
-  } catch (error) {
-      res.status(500).json({ error: 'Failed to create entry' });    
   }
 });
 
@@ -90,15 +87,35 @@ router.get('/entries/:id', async (req, res) => {
 // this will put - update existing entry
 router.put('/entries/:id', async (req, res) => {
   try {
-    const { text } = req.body;
+    const { text, image, removeImage } = req.body;
     
     if (!text || !text.trim()) {
       return res.status(400).json({ error: 'Entry text is required' });
     }
 
+    const updateData = { text: text.trim() };
+
+    // Handle image removal
+    if (removeImage) {
+      updateData.image = undefined;
+    }
+    // Handle image update/addition
+    else if (image && image.data) {
+      const base64Size = image.data.length * 0.75 / 1024 / 1024;
+      if (base64Size > 5) {
+        return res.status(400).json({ error: 'Image size must be less than 5MB' });
+      }
+
+      updateData.image = {
+        data: image.data,
+        contentType: image.contentType || 'image/jpeg',
+        filename: image.filename || 'photo.jpg'
+      };
+    }
+
     const entry = await Entry.findByIdAndUpdate(
       req.params.id,
-      { text: text.trim() },
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -108,7 +125,8 @@ router.put('/entries/:id', async (req, res) => {
 
     res.json(entry);
   } catch (error) {
-      res.status(500).json({ error: 'Failed to update entry' });
+    console.error('Error updating entry:', error);
+    res.status(500).json({ error: 'Failed to update entry' });
   }
 });
 
@@ -127,7 +145,7 @@ router.delete('/entries/:id', async (req, res) => {
   }
 });
 
-// this will get - search entries by text/tags
+// this will get - search entries by text/tags (user-specific)
 router.get('/search', async (req, res) => {
   try {
     const { q } = req.query;
@@ -136,9 +154,11 @@ router.get('/search', async (req, res) => {
       return res.status(400).json({ error: 'Search query is required' });
     }
 
-    const entries = await Entry.searchEntries(q.trim()); // use made static method
+    // Search only user's entries
+    const entries = await Entry.searchEntries(q.trim(), req.userId);
     res.json(entries);
   } catch (error) {
+    console.error('Search error:', error);
     res.status(500).json({ error: 'Failed to search entries' });
   }
 });

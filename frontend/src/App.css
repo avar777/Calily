@@ -318,7 +318,7 @@ button.delete-btn-rect:hover {
 /* AI Insights Card */
 .ai-insights-card {
   background: var(--card-bg);
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -416,8 +416,45 @@ button.delete-btn-rect:hover {
   margin-bottom: 0;
 }
 
-.pattern-analysis {
-  white-space: pre-wrap;
+/* Subheaders in insights */
+.insight-subheader {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem 0;
+  color: var(--primary-color);
+}
+
+.insight-subheader:first-child {
+  margin-top: 0;
+}
+
+/* Lists in insights */
+.insight-list {
+  margin: 0.5rem 0 1rem 1.5rem;
+  padding: 0;
+}
+
+.insight-list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+  position: relative;
+}
+
+.insight-list li::marker {
+  color: var(--primary-color);
+}
+
+.insight-list li:last-child {
+  margin-bottom: 0;
+}
+
+.insight-paragraph {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.insight-paragraph:last-child {
+  margin-bottom: 0;
 }
 
 .insight-meta {
@@ -496,4 +533,117 @@ button.delete-btn-rect:hover {
     font-size: 0.9rem;
     padding: 0.5rem 0.75rem;
   }
+}
+
+/* Icon button hover tooltips */
+.icon-btn {
+  position: relative;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  color: var(--text-color) !important;
+}
+
+.icon-btn svg {
+  stroke: var(--text-color) !important;
+}
+
+.icon-btn:hover {
+  transform: scale(1.15);
+  opacity: 1 !important;
+}
+
+.icon-btn:hover svg {
+  stroke: var(--text-color) !important;
+  opacity: 1 !important;
+}
+
+.icon-btn .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-5px);
+  background-color: var(--text-color);
+  color: var(--card-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+}
+
+.icon-btn .tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: var(--text-color);
+}
+
+.icon-btn:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
+}
+
+/* Entry item rectangle with better visual separation */
+.entry-item-rect {
+  background-color: var(--card-bg);
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.entry-item-rect:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-color: var(--accent-color);
+}
+
+/* Entry footer with better spacing */
+.entry-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.entry-date {
+  font-size: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.6;
+}
+
+/* Doctor Visit Styles */
+.doctor-visit-content {
+  background: rgba(0, 100, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #0064ff;
+}
+
+.doctor-visit-actions {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.doctor-visit-actions .btn-secondary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import ForgotPassword from './ForgotPassword';
 import './AuthPage.css';
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,6 +17,10 @@ const AuthPage = () => {
 
   const { login, signup } = useAuth();
   const navigate = useNavigate();
+
+  if (showForgotPassword) {
+    return <ForgotPassword onBack={() => setShowForgotPassword(false)} />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -111,6 +117,16 @@ const AuthPage = () => {
           >
             {loading ? 'Loading...' : (isLogin ? 'Login' : 'Sign Up')}
           </button>
+
+          {isLogin && (
+            <button
+              type="button"
+              onClick={() => setShowForgotPassword(true)}
+              className="auth-link-button"
+            >
+              Forgot Password?
+            </button>
+          )}
         </form>
       </div>
     </div>

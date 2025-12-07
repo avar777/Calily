@@ -2,17 +2,17 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthPage from './components/AuthPage';
-import Dashboard from './components/Dashboard';  // Your existing App content
+import Dashboard from './components/Dashboard';  // Your updated Dashboard
 import './App.css';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-
+  
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
-
+  
   return isAuthenticated ? children : <Navigate to="/auth" />;
 };
 

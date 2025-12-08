@@ -28,15 +28,13 @@ mongoose.connect(MONGODB_URI, {
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
-        'https://avar777.github.io',
-        'https://avar777.github.io/calily',
-        'https://calily-ihr63wim8-avar777s-projects.vercel.app',
-        'https://calily-1hvcz5hdc-avar777s-projects.vercel.app',
-        'https://calily.vercel.app',
+        'https://calily-api.vercel.app',
+        'https://calily-api-git-main-avar777s-projects.vercel.app',
+        'https://calily-4bux08ddl-avar777s-projects.vercel.app',
         'http://localhost:3000',
         /https:\/\/calily.*\.vercel\.app$/,
         process.env.FRONTEND_URL
-      ]
+      ].filter(Boolean)
     : ['http://localhost:3000'],
   credentials: true,
   optionsSuccessStatus: 200

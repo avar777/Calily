@@ -221,9 +221,9 @@ const AITrendGraph = ({ entries, medications = [] }) => {
   const getTrendIcon = () => {
     if (!trendData) return '';
     switch (trendData.trendDirection) {
-      case 'improving': return '';
-      case 'declining': return '';
-      case 'stable': return '';
+      case 'improving': return '📈';
+      case 'declining': return '📉';
+      case 'stable': return '➡️';
       default: return '';
     }
   };
@@ -265,15 +265,23 @@ const AITrendGraph = ({ entries, medications = [] }) => {
   }
 
   return (
-    <div className="card">
-      <h2 className="card-title">AI Trend Analysis</h2>
+    <div className="card" style={{ 
+      maxHeight: '600px',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      <h2 className="card-title" style={{ flexShrink: 0 }}>AI Trend Analysis</h2>
       
       {!trendData ? (
         <button onClick={fetchTrendAnalysis} className="btn-primary">
           Generate AI Trend Analysis
         </button>
       ) : (
-        <>
+        <div style={{ 
+          overflowY: 'auto',
+          flex: 1,
+          paddingRight: '0.5rem'
+        }}>
           {/* Trend Summary */}
           <div style={{ 
             padding: '1rem', 
@@ -403,7 +411,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
           >
             Refresh Analysis
           </button>
-        </>
+        </div>
       )}
     </div>
   );

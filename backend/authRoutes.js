@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('./models');
+const { sendPasswordResetEmail } = require('./emailService');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
@@ -166,10 +167,10 @@ router.post('/forgot-password', async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       // Don't reveal if user exists for security
-      return res.json({ message: 'If an account exists, a password reset link has been sent' });
+      return res.json({ message: 'If an account exists, a password reset code has been sent' });
     }
 
-    // Generate reset token (6-digit code for simplicity)
+    // Generate reset token (6-digit code)
     const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
     
     // Hash the token before storing
@@ -179,15 +180,29 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    // In production, send this via email
-    // For now, we'll return it in the response (ONLY FOR DEVELOPMENT)
-    console.log(`Password reset token for ${email}: ${resetToken}`);
-    
-    res.json({ 
-      message: 'If an account exists, a password reset link has been sent',
-      // REMOVE THIS IN PRODUCTION - only for development
-      resetToken: resetToken
-    });
+    // Send email in production, show in console in dev
+    if (process.env.NODE_ENV === 'production' && process.env.BREVO_API_KEY) {
+      try {
+        await sendPasswordResetEmail(user.email, resetToken);
+        console.log(`✓ Password reset email sent to: ${email}`);
+        res.json({ message: 'Password reset code sent to your email' });
+      } catch (emailError) {
+        console.error('Email send error:', emailError);
+        // Fallback to dev mode if email fails
+        console.log(`Password reset token for ${email}: ${resetToken}`);
+        res.json({ 
+          message: 'Email service temporarily unavailable',
+          resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined
+        });
+      }
+    } else {
+      // Development mode - show token in response
+      console.log(`Password reset token for ${email}: ${resetToken}`);
+      res.json({ 
+        message: 'Password reset token generated (dev mode)',
+        resetToken: resetToken
+      });
+    }
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ error: 'Failed to process request' });

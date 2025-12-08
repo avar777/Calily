@@ -221,9 +221,9 @@ const AITrendGraph = ({ entries, medications = [] }) => {
   const getTrendIcon = () => {
     if (!trendData) return '';
     switch (trendData.trendDirection) {
-      case 'improving': return '📈';
-      case 'declining': return '📉';
-      case 'stable': return '➡️';
+      case 'improving': return '';
+      case 'declining': return '';
+      case 'stable': return '';
       default: return '';
     }
   };

@@ -3,30 +3,46 @@
  * Theme picker component using CSS variables for dynamic styling
  *
  * Author: Ava Raper
- * Version: 1.0
+ * Version: 2.1 - Gear icon update
  */
 
 import React, { useState, useEffect } from 'react';
 
 const ThemePicker = () => {
-  // state to control dropdown visibility
   const [showPicker, setShowPicker] = useState(false);
   
-  // theme configuration using CSS variables 
   const themes = [
     {
       name: 'Default',
+      primary: '#7a9b7f',
+      background: '#f5f1e8',
+      cardBg: '#ffffff',
+      text: '#2c3e3f',
+      navtext: '#2c3e3f',
+      border: '#d98572',
+      inputBorder: '#d98572',
+      buttonText: '#ffffff',
+      deleteBtn: '#d98572',
+      deleteBtnText: '#ffffff',
+      chartBar: '#7a9b7f',
+      entryBorder: '#d98572',
+      setting: '#d4c5b0'
+    },
+    {
+      name: 'Light',
       primary: '#83bdf3ff',
       background: '#ffffffff',
       cardBg: '#a1a1a1ff',
       text: '#ffffffff',
+      navtext: '#000000',
       border: '#000000',
       inputBorder: '#000000',
       buttonText: '#ffffffff',
       deleteBtn: '#83bdf3ff',
       deleteBtnText: '#ffffff',
       chartBar: '#83bdf3ff',
-      entryBorder: '#000000'
+      entryBorder: '#83bdf3ff',
+      setting: '#a1a1a1ff'
     },
     {
       name: 'Dark',
@@ -34,63 +50,23 @@ const ThemePicker = () => {
       background: '#474747ff',
       cardBg: '#919191ff',
       text: '#ffffffff',
+      navtext: '#ffffffff',
       border: '#000000',
       inputBorder: '#000000',
       buttonText: '#ffffffff',
       deleteBtn: '#83bdf3ff',
       deleteBtnText: '#ffffff',
       chartBar: '#83bdf3ff',
-      entryBorder: '#000000'
-    },
-    {
-      name: 'Moody',
-      primary: '#d9ba8e',
-      background: '#303e5a',
-      cardBg: '#b27a49',
-      text: '#ffffffff',
-      border: '#f3f3f3ff',
-      inputBorder: '#ffffffff',
-      buttonText: '#ffffff',
-      deleteBtn: '#4c6444',
-      deleteBtnText: '#ffffff',
-      chartBar: '#4c6444',
-      entryBorder: '#ffffffff'
-    },
-    {
-      name: 'Vibrant',
-      primary: '#44ff60ff',
-      background: '#70caf4ff',
-      cardBg: '#fd89b3',
-      text: '#ffffffff',
-      border: '#ffff80ff',
-      inputBorder: '#a7d3ffff',
-      buttonText: '#000000ff',
-      deleteBtn: '#ffff96ff',
-      deleteBtnText: '#000000ff',
-      chartBar: '#a9f9b5ff',
-      entryBorder: '#a7d3ffff'
-    },
-    {
-      name: 'Warm',
-      primary: '#eacfa5',
-      background: '#8c9579',
-      cardBg: '#e6bb96',
-      text: '#6d6d6dff',
-      border: '#be9a98',
-      inputBorder: '#be9a98',
-      buttonText: '#6d6d6dff',
-      deleteBtn: '#aa7a79',
-      deleteBtnText: '#e4e4e4ff',
-      chartBar: '#be9a98',
-      entryBorder: '#be9a98'
+      entryBorder: '#83bdf3ff',
+      setting: '#474747ff'
     }
   ];
 
-   // this will apply theme by setting CSS custom properties
   const applyTheme = (theme) => {
     const root = document.documentElement;
-    // set CSS variables
     root.style.setProperty('--primary-color', theme.primary);
+    root.style.setProperty('--title-color', theme.primary);
+    root.style.setProperty('--nav-color', theme.navtext);
     root.style.setProperty('--bg-color', theme.background);
     root.style.setProperty('--card-bg', theme.cardBg);
     root.style.setProperty('--text-color', theme.text);
@@ -101,20 +77,18 @@ const ThemePicker = () => {
     root.style.setProperty('--delete-btn-text', theme.deleteBtnText);
     root.style.setProperty('--chart-bar', theme.chartBar);
     root.style.setProperty('--entry-border', theme.entryBorder);
+    root.style.setProperty('--setting-button-color', theme.setting);
     
-    // notify other components of theme change
     window.dispatchEvent(new CustomEvent('themeChanged'));
     
     localStorage.setItem('calily-theme', JSON.stringify(theme));
     setShowPicker(false);
   };
 
-  // load saved theme
   useEffect(() => {
     const savedTheme = localStorage.getItem('calily-theme');
     if (savedTheme) {
       try {
-        // restore previously selected theme
         applyTheme(JSON.parse(savedTheme));
       } catch (error) {
         console.error('Error loading saved theme:', error);
@@ -129,7 +103,6 @@ const ThemePicker = () => {
         onClick={() => setShowPicker(!showPicker)}
         title="Change theme"
       >
-        ☰
       </button>
       {showPicker && (
         <div className="theme-dropdown">

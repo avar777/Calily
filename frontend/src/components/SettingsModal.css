@@ -1,8 +1,9 @@
 /*
  * Calily - Settings Modal Styles
+ * Updated to use theme CSS variables
  * 
  * Author: Ava Raper
- * Version: 1.0
+ * Version: 2.2 - Theme tab added, password requirements removed
  */
 
 .modal-overlay {
@@ -11,12 +12,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
   animation: fadeIn 0.2s ease;
+  padding: 1rem;
+  overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -30,12 +33,12 @@
 
 .modal-content {
   background-color: var(--card-bg);
-  border-radius: 8px;
+  border-radius: 16px;
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.3s ease;
 }
 
@@ -62,31 +65,35 @@
   margin: 0;
   color: var(--text-color);
   font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .modal-close {
-  background: none;
-  border: none;
-  font-size: 2rem;
+  background: var(--setting-button-color);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
   color: var(--text-color);
   cursor: pointer;
   padding: 0;
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .modal-close:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  background: var(--delete-btn);
+  border-color: var(--delete-btn);
+  color: var(--delete-btn-text);
+  transform: rotate(90deg);
 }
 
 .settings-tabs {
   display: flex;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
   background-color: var(--card-bg);
 }
 
@@ -100,15 +107,17 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
+  font-weight: 500;
+  margin-bottom: -2px;
 }
 
 .settings-tab:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
 .settings-tab.active {
   border-bottom-color: var(--primary-color);
-  font-weight: bold;
+  font-weight: 600;
   color: var(--primary-color);
 }
 
@@ -124,12 +133,7 @@
   margin: 0 0 1.5rem 0;
   font-size: 1.2rem;
   color: var(--text-color);
-}
-
-.settings-section h4 {
-  margin: 1.5rem 0 0.75rem 0;
-  font-size: 1rem;
-  color: var(--text-color);
+  font-weight: 600;
 }
 
 .info-item {
@@ -144,12 +148,13 @@
 }
 
 .info-item label {
-  font-weight: bold;
+  font-weight: 600;
   color: var(--text-color);
 }
 
 .info-item span {
   color: var(--text-color);
+  opacity: 0.8;
 }
 
 .form-group {
@@ -167,54 +172,36 @@
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--input-border);
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 1rem;
   font-family: Arial, sans-serif;
   background-color: var(--card-bg);
   color: var(--text-color);
-  transition: border-color 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .settings-input:focus {
   outline: none;
   border-color: var(--primary-color);
-}
-
-.password-strength {
-  margin-top: 0.5rem;
-}
-
-.strength-bar-container {
-  width: 100%;
-  height: 4px;
-  background-color: #e0e0e0;
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 0.25rem;
-}
-
-.strength-bar {
-  height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
-  border-radius: 2px;
+  box-shadow: 0 0 0 3px rgba(122, 155, 127, 0.1);
 }
 
 .settings-error {
   padding: 0.75rem;
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
+  background-color: rgba(217, 133, 114, 0.1);
+  color: var(--delete-btn);
+  border: 1px solid var(--delete-btn);
+  border-radius: 8px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
 
 .settings-success {
   padding: 0.75rem;
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  border-radius: 4px;
+  background-color: rgba(122, 155, 127, 0.1);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 8px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }
@@ -224,40 +211,87 @@
   padding: 0.75rem 1.5rem;
   background-color: var(--primary-color);
   color: var(--button-text);
-  border: none;
-  border-radius: 4px;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
   font-size: 1rem;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
 }
 
 .settings-button:hover {
-  opacity: 0.9;
+  filter: brightness(0.9);
+  transform: translateY(-1px);
 }
 
 .settings-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
-.security-info {
-  margin-top: 2rem;
+/* Theme Options List - Color Swatches */
+.theme-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.theme-option-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
   padding: 1rem;
-  background-color: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--card-bg);
 }
 
-.security-info ul {
-  margin: 0.5rem 0 0 1.5rem;
-  padding: 0;
+.theme-option-card:hover {
+  border-color: var(--primary-color);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.theme-swatches {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-option-card span {
+  font-weight: 600;
   color: var(--text-color);
+  font-size: 1rem;
+  flex: 1;
 }
 
-.security-info li {
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+/* Scrollbar */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
 }
 
 /* Responsive */
@@ -273,5 +307,9 @@
 
   .modal-body {
     padding: 1rem;
+  }
+  
+  .theme-options-list {
+    grid-template-columns: 1fr;
   }
 }

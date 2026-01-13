@@ -1,9 +1,9 @@
 /*
  * Calily - Settings Modal Component
- * Handles user settings including password change
+ * Handles user settings including password change and theme selection
  * 
  * Author: Ava Raper
- * Version: 1.0
+ * Version: 2.0
  */
 
 import React, { useState } from 'react';
@@ -18,37 +18,82 @@ const SettingsModal = ({ isOpen, onClose }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState('');
 
   const { user } = useAuth();
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
+  const themes = [
+    {
+      name: 'Default',
+      primary: '#7a9b7f',
+      background: '#f5f1e8',
+      cardBg: '#ffffff',
+      text: '#2c3e3f',
+      navtext: '#2c3e3f',
+      border: '#d4c5b0',
+      inputBorder: '#d4c5b0',
+      buttonText: '#ffffff',
+      deleteBtn: '#d98572',
+      deleteBtnText: '#ffffff',
+      chartBar: '#7a9b7f',
+      entryBorder: '#7a9b7f',
+      setting: '#d4c5b0'
+    },
+    {
+      name: 'Light',
+      primary: '#83bdf3ff',
+      background: '#ffffffff',
+      cardBg: '#a1a1a1ff',
+      text: '#ffffffff',
+      navtext: '#000000',
+      border: '#000000',
+      inputBorder: '#000000',
+      buttonText: '#ffffffff',
+      deleteBtn: '#83bdf3ff',
+      deleteBtnText: '#ffffff',
+      chartBar: '#83bdf3ff',
+      entryBorder: '#000000',
+      setting: '#a1a1a1ff'
+    },
+    {
+      name: 'Dark',
+      primary: '#83bdf3ff',
+      background: '#474747ff',
+      cardBg: '#919191ff',
+      text: '#ffffffff',
+      navtext: '#ffffffff',
+      border: '#000000',
+      inputBorder: '#000000',
+      buttonText: '#ffffffff',
+      deleteBtn: '#83bdf3ff',
+      deleteBtnText: '#ffffff',
+      chartBar: '#83bdf3ff',
+      entryBorder: '#000000',
+      setting: '#474747ff'
+    }
+  ];
+
   if (!isOpen) return null;
 
-  const checkPasswordStrength = (password) => {
-    if (password.length < 6) return 'weak';
-    if (password.length < 8) return 'fair';
+  const applyTheme = (theme) => {
+    const root = document.documentElement;
+    root.style.setProperty('--primary-color', theme.primary);
+    root.style.setProperty('--title-color', theme.primary);
+    root.style.setProperty('--nav-color', theme.navtext);
+    root.style.setProperty('--bg-color', theme.background);
+    root.style.setProperty('--card-bg', theme.cardBg);
+    root.style.setProperty('--text-color', theme.text);
+    root.style.setProperty('--border-color', theme.border);
+    root.style.setProperty('--input-border', theme.inputBorder);
+    root.style.setProperty('--button-text', theme.buttonText);
+    root.style.setProperty('--delete-btn', theme.deleteBtn);
+    root.style.setProperty('--delete-btn-text', theme.deleteBtnText);
+    root.style.setProperty('--chart-bar', theme.chartBar);
+    root.style.setProperty('--entry-border', theme.entryBorder);
+    root.style.setProperty('--setting-button-color', theme.setting);
     
-    const hasNumber = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const hasUpper = /[A-Z]/.test(password);
-    const hasLower = /[a-z]/.test(password);
-    
-    const strength = [hasNumber, hasSpecial, hasUpper, hasLower].filter(Boolean).length;
-    
-    if (strength >= 3 && password.length >= 10) return 'strong';
-    if (strength >= 2 && password.length >= 8) return 'good';
-    return 'fair';
-  };
-
-  const handleNewPasswordChange = (e) => {
-    const pwd = e.target.value;
-    setNewPassword(pwd);
-    if (pwd) {
-      setPasswordStrength(checkPasswordStrength(pwd));
-    } else {
-      setPasswordStrength('');
-    }
+    window.dispatchEvent(new CustomEvent('themeChanged'));
+    localStorage.setItem('calily-theme', JSON.stringify(theme));
   };
 
   const handleChangePassword = async (e) => {
@@ -86,7 +131,6 @@ const SettingsModal = ({ isOpen, onClose }) => {
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
-        setPasswordStrength('');
         
         setTimeout(() => {
           setSuccess('');
@@ -98,16 +142,6 @@ const SettingsModal = ({ isOpen, onClose }) => {
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const getPasswordStrengthColor = () => {
-    switch (passwordStrength) {
-      case 'weak': return '#dc3545';
-      case 'fair': return '#ffc107';
-      case 'good': return '#17a2b8';
-      case 'strong': return '#28a745';
-      default: return '#ccc';
     }
   };
 
@@ -131,6 +165,12 @@ const SettingsModal = ({ isOpen, onClose }) => {
             onClick={() => setActiveTab('security')}
           >
             Security
+          </button>
+          <button
+            className={`settings-tab ${activeTab === 'theme' ? 'active' : ''}`}
+            onClick={() => setActiveTab('theme')}
+          >
+            Theme
           </button>
         </div>
 
@@ -160,7 +200,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
           {activeTab === 'security' && (
             <div className="settings-section">
               <h3>Change Password</h3>
-              <form onSubmit={handleChangePassword}>
+              <div className="password-change-section">
                 <div className="form-group">
                   <label>Current Password</label>
                   <input
@@ -177,30 +217,11 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   <input
                     type="password"
                     value={newPassword}
-                    onChange={handleNewPasswordChange}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     required
                     minLength="6"
                     className="settings-input"
                   />
-                  {passwordStrength && (
-                    <div className="password-strength">
-                      <div className="strength-bar-container">
-                        <div 
-                          className="strength-bar"
-                          style={{ 
-                            width: passwordStrength === 'weak' ? '25%' 
-                              : passwordStrength === 'fair' ? '50%'
-                              : passwordStrength === 'good' ? '75%'
-                              : '100%',
-                            backgroundColor: getPasswordStrengthColor()
-                          }}
-                        />
-                      </div>
-                      <span style={{ color: getPasswordStrengthColor(), fontSize: '0.85rem' }}>
-                        Strength: {passwordStrength}
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 <div className="form-group">
@@ -219,21 +240,35 @@ const SettingsModal = ({ isOpen, onClose }) => {
                 {success && <div className="settings-success">{success}</div>}
 
                 <button 
-                  type="submit" 
+                  onClick={handleChangePassword}
                   className="settings-button"
                   disabled={loading}
                 >
                   {loading ? 'Changing...' : 'Change Password'}
                 </button>
-              </form>
+              </div>
+            </div>
+          )}
 
-              <div className="security-info">
-                <h4>Password Requirements:</h4>
-                <ul>
-                  <li>At least 6 characters long</li>
-                  <li>Recommended: Include numbers and special characters</li>
-                  <li>Recommended: Mix of uppercase and lowercase letters</li>
-                </ul>
+          {activeTab === 'theme' && (
+            <div className="settings-section">
+              <h3>Choose Theme</h3>
+              <div className="theme-options-list">
+                {themes.map((theme) => (
+                  <div
+                    key={theme.name}
+                    className="theme-option-card"
+                    onClick={() => applyTheme(theme)}
+                  >
+                    <div className="theme-swatches">
+                      <div className="color-swatch" style={{ backgroundColor: theme.entryBorder }}></div>
+                      <div className="color-swatch" style={{ backgroundColor: theme.background }}></div>
+                      <div className="color-swatch" style={{ backgroundColor: theme.cardBg }}></div>
+                      <div className="color-swatch" style={{ backgroundColor: theme.deleteBtn }}></div>
+                    </div>
+                    <span>{theme.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}

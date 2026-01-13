@@ -1,45 +1,36 @@
-/*
+/**
  * Calily
- * Main React application component 
+ * Main application component with page-based navigation
  *
  * Author: Ava Raper
- * Version: 1.0
+ * Version: 2.1 - Theme picker removed from header
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import '../App.css';
-import EntryCard from './EntryCard';
-import MedCard from './MedCard';
-import TimelineCard from './TimelineCard';
-import SearchCard from './SearchCard';
-import ExportCard from './ExportCard';
-import ThemePicker from './ThemePicker';
-import AIInsightsCard from './AICard';
-import AITrendGraph from './AITrendGraph';
+import DashboardPage from './pages/DashboardPage';
+import MedicationsPage from './pages/MedicationsPage';
+import AIInsightsPage from './pages/AIInsightsPage';
+import ExportPage from './pages/ExportPage';
 import SettingsModal from './SettingsModal';
 import apiService from '../services/api';
 
-function App() {
-  // state management using React Hooks
+function Dashboard() {
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const [entries, setEntries] = useState([]);
   const [medications, setMedications] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
   const [aiInsights, setAiInsights] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
-
   const [error, setError] = useState(null);
 
-  // fetch data on mount
   useEffect(() => {
     fetchEntries();
     fetchMedications();
   }, []);
 
-  // async data fetching 
   const fetchEntries = async () => {
     try {
       setError(null);
-      // get all entries from backend
       const data = await apiService.getEntries();
       setEntries(data || []);
     } catch (error) {
@@ -59,12 +50,9 @@ function App() {
     }
   };
 
-  // this will add new entries 
   const addEntry = async (entryText, imageData = null) => {
     try {
-      // creates new entry with optional image
       const newEntry = await apiService.createEntry(entryText, imageData);
-      // update with new entry first 
       setEntries([newEntry, ...entries]);
     } catch (error) {
       console.error('Error adding entry:', error);
@@ -72,118 +60,118 @@ function App() {
     }
   };
 
-  // this will handle entry delection
   const handleEntryDeleted = (deletedEntryId) => {
-    // remove the entry from array
     setEntries(prevEntries =>
       prevEntries.filter(entry => entry._id !== deletedEntryId)
     );
-    // remove from the search array 
-    setSearchResults(prevResults =>
-      prevResults.filter(entry => entry._id !== deletedEntryId)
-    );
   };
 
-  // this will handle entry updates
   const handleEntryUpdated = (updatedEntry) => {
-    // update the entry in the entries array
     setEntries(prevEntries =>
       prevEntries.map(entry =>
         entry._id === updatedEntry._id ? updatedEntry : entry
       )
     );
-    // update in search results too if present
-    setSearchResults(prevResults =>
-      prevResults.map(entry =>
-        entry._id === updatedEntry._id ? updatedEntry : entry
-      )
-    );
   };
 
-  // this will handle the search
-  const searchEntries = async (searchTerm) => {
-    if (!searchTerm.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    try {
-      // this will use API for the search card
-      const results = await apiService.searchEntries(searchTerm);
-      setSearchResults(results || []);
-    } catch (error) {
-      console.error('Error searching entries:', error);
-      setError('Search failed. Please try again.');
-    }
-  };
-
-  // Handle AI insights updates
   const handleInsightsGenerated = useCallback((insights) => {
     setAiInsights(insights);
   }, []);
 
+  const renderPage = () => {
+    switch(currentPage) {
+      case 'dashboard':
+        return (
+          <DashboardPage
+            entries={entries}
+            onAddEntry={addEntry}
+            onEntryDeleted={handleEntryDeleted}
+            onEntryUpdated={handleEntryUpdated}
+          />
+        );
+      case 'medications':
+        return <MedicationsPage />;
+      case 'ai-insights':
+        return (
+          <AIInsightsPage
+            entries={entries}
+            medications={medications}
+            onInsightsGenerated={handleInsightsGenerated}
+          />
+        );
+      case 'export':
+        return (
+          <ExportPage
+            entries={entries}
+            aiInsights={aiInsights}
+          />
+        );
+      default:
+        return <DashboardPage entries={entries} onAddEntry={addEntry} />;
+    }
+  };
+
   return (
-  <div className="app">
-    <ThemePicker />
-    <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
-    <div className="container">
-      <div style={{ position: 'relative' }}>
-        <h1 className="chunky-title">CALILY</h1>
-        <button
-          onClick={() => setShowSettings(true)}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '0',
-            background: 'none',
-            border: 'none',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-            color: 'var(--primary-color)',
-            padding: '8px',
-            borderRadius: '4px',
-            transition: 'background-color 0.2s'
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(0,0,0,0.1)'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-          title="Settings"
-        >
-          ⚙️
-        </button>
-      </div>
-      {error && (
-        <div className="error-message">
-          {error}
-          <button
-            onClick={() => setError(null)}
-            className="error-close-btn"
-          >
-            ÃƒÆ’Ã‚Â¢Ãƒâ€¦Ã¢â‚¬Å“ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢
-          </button>
+    <div className="app">
+      <div className="container">
+        <div className="app-header">
+          <h1 className="app-title">CALILY</h1>
+          <div className="header-actions">
+            <button
+              onClick={() => setShowSettings(true)}
+              className="settings-button"
+              title="Settings"
+            />
+          </div>
         </div>
-      )}
-      <div className="cards-container">
-        <EntryCard onAddEntry={addEntry} />
-        <MedCard />
-        <TimelineCard
-          entries={entries}
-          onEntryDeleted={handleEntryDeleted}
-          onEntryUpdated={handleEntryUpdated}
-        />
-        <SearchCard
-          onSearch={searchEntries}
-          searchResults={searchResults}
-        />
-        <AITrendGraph entries={entries} medications={medications} />
-        <AIInsightsCard 
-          entries={entries} 
-          medications={medications} 
-          onInsightsGenerated={handleInsightsGenerated}
-        />
-        <ExportCard entries={entries} aiInsights={aiInsights} />
+
+        <nav className="navigation">
+          <button
+            className={`nav-button ${currentPage === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('dashboard')}
+          >
+            Dashboard
+          </button>
+          <button
+            className={`nav-button ${currentPage === 'medications' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('medications')}
+          >
+            Medications
+          </button>
+          <button
+            className={`nav-button ${currentPage === 'ai-insights' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('ai-insights')}
+          >
+            AI Insights
+          </button>
+          <button
+            className={`nav-button ${currentPage === 'export' ? 'active' : ''}`}
+            onClick={() => setCurrentPage('export')}
+          >
+            Export
+          </button>
+        </nav>
+
+        {error && (
+          <div className="error-message">
+            {error}
+            <button
+              onClick={() => setError(null)}
+              className="error-close-btn"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
+        <div className="page-content">
+          {renderPage()}
+        </div>
       </div>
+
+      <SettingsModal isOpen={showSettings} onClose={() => setShowSettings(false)} />
     </div>
-  </div>
-);
+  );
 }
 
-export default App;
+export default Dashboard;

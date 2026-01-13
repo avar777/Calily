@@ -1,16 +1,17 @@
 /*
  * Calily - Enhanced MedCard Styles
- * Styling for medication tracker with multiple doses per day
+ * Updated to match Security Log Analyzer design
  * 
  * Author: Ava Raper
- * Version: 2.1 - LIGHTER COLORS
+ * Version: 3.0 - Redesigned
  */
 
 .med-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .med-card .card-header {
@@ -22,18 +23,19 @@
 
 .med-card h2 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
+  font-weight: 600;
   color: var(--text-color);
 }
 
 /* Error message */
 .med-error {
-  background-color: rgba(255, 0, 0, 0.1);
-  border: 1px solid rgba(255, 0, 0, 0.3);
-  border-radius: 4px;
+  background-color: rgba(217, 133, 114, 0.1);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
   padding: 0.75rem;
   margin-bottom: 1rem;
-  color: #c00;
+  color: var(--danger);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -44,20 +46,25 @@
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #c00;
+  color: var(--danger);
   padding: 0;
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
 }
 
-/* Add medication form - LIGHTER */
+.error-close:hover {
+  transform: scale(1.2);
+}
+
+/* Add medication form */
 .med-form {
-  background: var(--card-bg);
+  background: #f9f6f0;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
+  border-radius: 12px;
   padding: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -79,12 +86,12 @@
   flex: 1;
 }
 
-/* Track-only option - LIGHTER */
+/* Track-only option */
 .track-only-option {
   margin-top: 0.5rem;
   padding: 0.75rem;
   background: var(--card-bg);
-  border-radius: 4px;
+  border-radius: 8px;
   border: 1px dashed var(--border-color);
 }
 
@@ -94,32 +101,35 @@
   gap: 0.5rem;
   cursor: pointer;
   font-weight: 500;
+  color: var(--text-color);
 }
 
 .track-only-checkbox {
   width: 18px;
   height: 18px;
   cursor: pointer;
+  accent-color: var(--primary-color);
 }
 
 .track-only-hint {
   display: block;
   margin-top: 0.5rem;
   margin-left: 1.75rem;
-  color: #666;
+  color: var(--text-light);
   font-size: 0.85rem;
   font-style: italic;
 }
 
 /* Track-only badge */
 .track-only-badge {
-  color: #666;
+  color: var(--text-light);
   font-style: italic;
+  font-size: 0.85rem;
 }
 
 /* Empty state */
 .med-empty {
-  color: #999;
+  color: var(--text-light);
   font-style: italic;
   text-align: center;
   padding: 2rem 1rem;
@@ -132,18 +142,19 @@
   gap: 1rem;
 }
 
-/* Medication item - MUCH LIGHTER */
+/* Medication item */
 .med-item {
   padding: 1.25rem;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  transition: all 0.2s ease;
 }
 
 .med-item:hover {
   border-color: var(--primary-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
 }
 
 .med-info-section {
@@ -165,7 +176,7 @@
 }
 
 .med-name {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 1.1rem;
   color: var(--text-color);
 }
@@ -181,7 +192,7 @@
 
 .med-details {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-light);
   margin-bottom: 1rem;
 }
 
@@ -192,24 +203,25 @@
   height: 32px;
   border: 1px solid var(--border-color);
   background: transparent;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1.5rem;
-  color: var(--text-color);
+  color: var(--text-light);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   line-height: 1;
 }
 
 .med-delete-btn:hover {
-  background-color: #dc3545;
-  border-color: #dc3545;
+  background-color: var(--danger);
+  border-color: var(--danger);
   color: white;
+  transform: translateY(-1px);
 }
 
-/* ENHANCED: Multiple Doses Section */
+/* Multiple Doses Section */
 .med-doses {
   display: flex;
   flex-wrap: wrap;
@@ -218,7 +230,7 @@
   border-top: 1px solid var(--border-color);
 }
 
-/* Dose checkbox label - LIGHTER */
+/* Dose checkbox label */
 .dose-checkbox-label {
   display: flex;
   align-items: center;
@@ -228,24 +240,25 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   user-select: none;
 }
 
 .dose-checkbox-label:hover {
   border-color: var(--primary-color);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
 }
 
 .dose-checkbox {
   appearance: none;
   width: 20px;
   height: 20px;
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color);
   border-radius: 4px;
   cursor: pointer;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   background-color: var(--card-bg);
   flex-shrink: 0;
 }
@@ -286,7 +299,8 @@
   padding-top: 0.75rem;
   border-top: 1px solid var(--border-color);
   text-align: center;
-  color: #666;
+  color: var(--text-light);
+  font-size: 0.85rem;
 }
 
 /* Responsive design */

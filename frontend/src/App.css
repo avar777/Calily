@@ -1,22 +1,26 @@
 /*
  * Calily
- * Main stylesheet with CSS variables for dynamic theming
+ * Main stylesheet with page-based navigation
  *
  * Author: Ava Raper
- * Version: 1.0
+ * Version: 2.1 - Theme button removed, settings with gear icon
  */
+
 :root {
-  --primary-color: #000000;
-  --bg-color: #ffffff;
+  --primary-color: #7a9b7f;
+  --title-color: #7a9b7f;
+  --nav-color: #2c3e3f;
+  --bg-color: #f5f1e8;
+  --setting-button-color: #d4c5b0;
   --card-bg: #ffffff;
-  --text-color: #000000;
-  --border-color: #000000;
-  --input-border: #000000;
+  --text-color: #2c3e3f;
+  --border-color: #d4c5b0;
+  --input-border: #d4c5b0;
   --button-text: #ffffff;
-  --delete-btn: #000000;
+  --delete-btn: #d98572;
   --delete-btn-text: #ffffff;
-  --chart-bar: #000000;
-  --entry-border: #000000;
+  --chart-bar: #7a9b7f;
+  --entry-border: #7a9b7f;
 }
 
 * {
@@ -29,115 +33,254 @@
   min-height: 100vh;
   font-family: Arial, sans-serif;
   background-color: var(--bg-color);
-  padding: 2rem 1rem;
   color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 .container {
-  max-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
-.chunky-title {
-  position: sticky;
-  font-size: 3rem;
+/* Header */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0;
+}
+
+.app-title {
+  font-size: 2rem;
   font-weight: bold;
-  text-align: center;
-  top: 0;
-  z-index: 100;
-  padding: 20px 0;
-  margin: 0 0 20px 0;
-  color: var(--primary-color);
-  background: var(--bg-color);
-  transition: color 0.3s ease, background-color 0.3s ease;
+  color: var(--title-color);
+  margin: 0;
 }
 
-.cards-container {
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Settings Button with Gear Icon */
+.settings-button {
+  background: var(--primary-color);
+  border: 2px solid var(--primary-color);
+  color: var(--button-text);
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.settings-button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* White Three Lines Icon (Hamburger Menu) */
+.settings-button::before {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='3' y1='6' x2='21' y2='6'/%3E%3Cline x1='3' y1='12' x2='21' y2='12'/%3E%3Cline x1='3' y1='18' x2='21' y2='18'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Navigation */
+.navigation {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 2rem;
+  overflow-x: auto;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--nav-color);
+  transition: all 0.2s ease;
+  font-weight: 500;
+  white-space: nowrap;
+  margin-bottom: -2px;
+}
+
+.nav-button:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.nav-button.active {
+  border-bottom-color: var(--primary-color);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Page Content */
+.page-content {
+  padding-bottom: 2rem;
+}
+
+.page-grid {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
+.page-single {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-section {
+  width: 100%;
+}
+
+/* Cards */
 .card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   color: var(--text-color);
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .card-title {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1.25rem;
+  font-weight: 600;
   margin-bottom: 1rem;
   color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Input Fields */
 .input-field {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--input-border);
-  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
   font-size: 1rem;
   margin-bottom: 1rem;
   font-family: Arial, sans-serif;
   background-color: var(--card-bg);
   color: var(--text-color);
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .input-field:focus {
   outline: none;
   border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
 }
 
+.input-field::placeholder {
+  color: var(--text-color);
+  opacity: 0.5;
+}
+
+/* Buttons */
 .btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   background-color: var(--primary-color);
   color: var(--button-text);
   padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
   font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  filter: brightness(1.1);
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-secondary {
-  background-color: var(--primary-color);
-  color: var(--button-text);
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
   padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  filter: brightness(1.1);
+  background-color: var(--primary-color);
+  color: var(--button-text);
+  border-color: var(--primary-color);
 }
 
-.entry-item {
-  background-color: var(--card-bg);
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Entry Items */
+.entry-item,
+.entry-item-rect {
+  background-color: rgba(0, 0, 0, 0.02);
   padding: 1rem;
-  border-radius: 4px;
+  border-radius: 8px;
   margin-bottom: 0.75rem;
   border-left: 3px solid var(--entry-border);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.entry-item:hover,
+.entry-item-rect:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .entry-text {
-  margin-bottom: 10px;
+  margin-bottom: 0.5rem;
   font-size: 1rem;
-  margin-bottom: 0.625rem;
-  padding-right: 5rem;
+  line-height: 1.4;
   color: var(--text-color);
 }
 
@@ -145,109 +288,114 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .entry-date {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.6;
+}
+
+/* Icon Buttons */
+.icon-btn {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
   color: var(--text-color);
   opacity: 0.7;
+  transition: all 0.2s ease;
 }
 
-.chart-container {
-  width: 100%;
-  height: 300px;
-  margin-top: 1rem;
+.icon-btn:hover {
+  transform: scale(1.15);
+  opacity: 1;
 }
 
-.no-entries {
-  text-align: center;
-  color: var(--text-color);
-  opacity: 0.7;
-  font-style: italic;
-  padding: 2rem;
+.icon-btn .tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-5px);
+  background-color: var(--text-color);
+  color: var(--card-bg);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+  font-weight: 500;
 }
 
-.search-results {
-  max-height: 300px;
-  overflow-y: auto;
+.icon-btn:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) translateY(-8px);
 }
 
-.delete-btn-rect,
-button.delete-btn-rect {
+/* Delete Button */
+.delete-btn-rect {
   background: var(--delete-btn) !important;
   color: var(--delete-btn-text) !important;
   border: none !important;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 6px 12px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
-.delete-btn-rect:hover,
-button.delete-btn-rect:hover {
-  filter: brightness(1.1) !important;
+.delete-btn-rect:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
-.theme-picker {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-}
-
-.theme-btn {
-  background: var(--primary-color);
-  border: none;
+/* Error Messages */
+.error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #c00;
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  padding: 1rem;
   border-radius: 8px;
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  transition: transform 0.2s;
-  color: var(--button-text);
-  font-size: 16px;
-}
-
-.theme-btn:hover {
-  transform: scale(1.1);
-}
-
-.theme-dropdown {
-  position: absolute;
-  top: 60px;
-  right: 0;
-  background: var(--card-bg);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-  min-width: 160px;
-  border: 1px solid var(--border-color);
-}
-
-.theme-dropdown h4 {
-  margin: 0 0 12px 0;
-  font-size: 14px;
-  color: var(--text-color);
-  opacity: 0.7;
-}
-
-.theme-option {
+  margin-bottom: 1rem;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  padding: 8px;
-  border-radius: 8px;
+}
+
+.error-close-btn {
+  background: none;
+  border: none;
+  color: #c00;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 20px;
+  padding: 0 8px;
+  transition: all 0.2s ease;
+}
+
+.error-close-btn:hover {
+  transform: scale(1.2);
+}
+
+/* No Entries State */
+.no-entries {
+  text-align: center;
   color: var(--text-color);
+  opacity: 0.6;
+  font-style: italic;
+  padding: 2rem;
 }
 
-.theme-option:hover {
-  background-color: var(--bg-color);
-}
-
+/* Search */
 .search-input-wrapper {
   position: relative;
   display: inline-block;
@@ -255,7 +403,7 @@ button.delete-btn-rect:hover {
 }
 
 .search-input {
-  padding-right: 40px; 
+  padding-right: 40px;
 }
 
 .clear-search-btn {
@@ -268,91 +416,69 @@ button.delete-btn-rect:hover {
   font-size: 18px;
   color: var(--text-color);
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 4px 8px;
   border-radius: 50%;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: all 0.2s ease;
   opacity: 0.7;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
-  margin-top: -7px; 
+  margin-top: -7px;
 }
 
 .clear-search-btn:hover {
-  opacity: 1;
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-.error-message {
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  border: 2px solid var(--primary-color);
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  text-align: center;
-  opacity: 0.9;
-}
-
-.error-close-btn {
-  margin-left: 1rem;
-  background: none;
-  border: none;
-  color: var(--text-color);
-  cursor: pointer;
-  font-size: 16px;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-.error-close-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
   opacity: 1;
 }
 
-/*
- * Calily - AI Insights Component Styles
- * Add these styles to your App.css
- */
+.search-results {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 1rem;
+}
 
-/* AI Insights Card */
+/* Chart Container */
+.chart-container {
+  width: 100%;
+  height: 300px;
+  margin-top: 1rem;
+}
+
+/* Loading States */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.ai-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.ai-loading p {
+  color: var(--text-color);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+/* AI Insights Styles */
 .ai-insights-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.btn-secondary {
-  background-color: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-  background-color: var(--primary-color);
-  color: var(--button-text);
-}
-
-.btn-secondary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* AI Tabs */
 .ai-tabs {
   display: flex;
   gap: 0.5rem;
@@ -367,18 +493,20 @@ button.delete-btn-rect:hover {
   cursor: pointer;
   font-size: 1rem;
   color: var(--text-color);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   border-bottom: 2px solid transparent;
   margin-bottom: -2px;
+  font-weight: 500;
 }
 
 .tab-button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
 .tab-button.active {
   border-bottom-color: var(--primary-color);
-  font-weight: bold;
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 .ai-content {
@@ -416,7 +544,6 @@ button.delete-btn-rect:hover {
   margin-bottom: 0;
 }
 
-/* Subheaders in insights */
 .insight-subheader {
   font-size: 1rem;
   font-weight: 600;
@@ -428,7 +555,6 @@ button.delete-btn-rect:hover {
   margin-top: 0;
 }
 
-/* Lists in insights */
 .insight-list {
   margin: 0.5rem 0 1rem 1.5rem;
   padding: 0;
@@ -461,39 +587,14 @@ button.delete-btn-rect:hover {
   margin-top: 1rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--border-color);
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.6;
 }
 
 .insight-placeholder {
-  color: #999;
-  font-style: italic;
-}
-
-.ai-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid var(--border-color);
-  border-top-color: var(--primary-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.ai-loading p {
   color: var(--text-color);
-  font-size: 0.9rem;
+  opacity: 0.6;
+  font-style: italic;
 }
 
 .ai-disclaimer {
@@ -509,141 +610,58 @@ button.delete-btn-rect:hover {
   line-height: 1.4;
 }
 
-.error-message {
-  padding: 1rem;
-  background-color: rgba(255, 0, 0, 0.1);
-  border: 1px solid rgba(255, 0, 0, 0.3);
-  border-radius: 4px;
-  color: #c00;
-  margin-bottom: 1rem;
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-color);
+  opacity: 0.5;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .card-header {
+  .app-header {
     flex-direction: column;
     gap: 1rem;
     align-items: flex-start;
   }
 
-  .ai-tabs {
-    flex-wrap: wrap;
+  .app-title {
+    font-size: 1.5rem;
   }
 
-  .tab-button {
+  .navigation {
+    overflow-x: auto;
+  }
+
+  .nav-button {
+    padding: 0.75rem 1rem;
     font-size: 0.9rem;
-    padding: 0.5rem 0.75rem;
+  }
+
+  .card {
+    padding: 1rem;
   }
 }
 
-/* Icon button hover tooltips */
-.icon-btn {
-  position: relative;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  color: var(--text-color) !important;
-}
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.5rem;
+  }
 
-.icon-btn svg {
-  stroke: var(--text-color) !important;
-}
-
-.icon-btn:hover {
-  transform: scale(1.15);
-  opacity: 1 !important;
-}
-
-.icon-btn:hover svg {
-  stroke: var(--text-color) !important;
-  opacity: 1 !important;
-}
-
-.icon-btn .tooltip {
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-5px);
-  background-color: var(--text-color);
-  color: var(--card-bg);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  white-space: nowrap;
-  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
-  pointer-events: none;
-  z-index: 10;
-  font-weight: 500;
-  border: 1px solid var(--border-color);
-}
-
-.icon-btn .tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 4px solid transparent;
-  border-top-color: var(--text-color);
-}
-
-.icon-btn:hover .tooltip {
-  visibility: visible;
-  opacity: 1;
-  transform: translateX(-50%) translateY(-8px);
-}
-
-/* Entry item rectangle with better visual separation */
-.entry-item-rect {
-  background-color: var(--card-bg);
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 0.75rem;
-  border: 1px solid var(--border-color);
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.entry-item-rect:hover {
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border-color: var(--accent-color);
-}
-
-/* Entry footer with better spacing */
-.entry-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.entry-date {
-  font-size: 0.85rem;
-  color: var(--text-color);
-  opacity: 0.6;
-}
-
-/* Doctor Visit Styles */
-.doctor-visit-content {
-  background: rgba(0, 100, 255, 0.05);
-  padding: 1.5rem;
-  border-radius: 8px;
-  border-left: 4px solid #0064ff;
-}
-
-.doctor-visit-actions {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  gap: 0.5rem;
-}
-
-.doctor-visit-actions .btn-secondary {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  .page-content {
+    padding-bottom: 1rem;
+  }
 }

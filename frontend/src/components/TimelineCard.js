@@ -237,7 +237,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
                         display: 'inline-block'
                       }}
                     >
-                      📷 {editImagePreview && !removeImageFlag ? 'Change Photo' : 'Add Photo'}
+                       {editImagePreview && !removeImageFlag ? 'Change Photo' : 'Add Photo'}
                     </label>
                   </div>
 

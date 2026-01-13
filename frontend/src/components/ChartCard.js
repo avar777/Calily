@@ -10,35 +10,34 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
 const ChartCard = ({ entries = [] }) => {
-  // useRef for D3 DOM access
+  // Need a ref so D3 can access the DOM
   const svgRef = useRef();
-  // state for theme change
+  // Trigger re-render when theme changes
   const [themeChangeKey, setThemeChangeKey] = useState(0);
 
-  // listen for theme changes
+  // Listen for theme changes
   useEffect(() => {
     const handleThemeChange = () => {
-      // trigger chart re-render
-      setThemeChangeKey(prev => prev + 1); 
+      setThemeChangeKey(prev => prev + 1); // Force chart to redraw
     };
 
     window.addEventListener('themeChanged', handleThemeChange);
     return () => window.removeEventListener('themeChanged', handleThemeChange);
   }, []);
 
-  // main D3 chart rendering
+  // Main D3 chart rendering
   useEffect(() => {
-    // clear previous chart
+    // Clear previous chart
     if (svgRef.current) {
       d3.select(svgRef.current).selectAll("*").remove();
     }
 
-    // guard for empty data
+    // Bail if there's no data
     if (!Array.isArray(entries) || entries.length === 0) {
       return;
     }
 
-    // health symptom keywords for data analysis
+    // Health symptom keywords for analyzing entries
     const symptomKeywords = [
       'fatigue', 'tired', 'exhausted', 'weak', 'weakness', 'energy', 'drained',
       'pain', 'ache', 'aches', 'sore', 'tender', 'burning', 'sharp pain', 'throbbing',
@@ -65,13 +64,13 @@ const ChartCard = ({ entries = [] }) => {
       'family', 'friends', 'social', 'alone', 'busy', 'relaxing'
     ];
 
-    // initialize symptom frequency counter
+    // Count how many times each symptom appears
     const symptomCounts = {};
     symptomKeywords.forEach(symptom => {
       symptomCounts[symptom] = 0;
     });
 
-    // analyze entries for symptom frequency
+    // Go through all entries and count keywords
     entries.forEach(entry => {
       if (entry && entry.text && typeof entry.text === 'string') {
         const text = entry.text.toLowerCase();
@@ -83,7 +82,7 @@ const ChartCard = ({ entries = [] }) => {
       }
     });
 
-    // transform data for D3 visualization
+    // Turn the counts into chart data (top 10 only)
     const data = Object.entries(symptomCounts)
       .filter(([symptom, count]) => count > 0)
       .map(([symptom, count]) => ({ symptom, count }))
@@ -92,16 +91,15 @@ const ChartCard = ({ entries = [] }) => {
 
     if (data.length === 0) return;
 
-    // get current theme color for chart
+    // Get the current theme's bar color
     const chartBarColor = getComputedStyle(document.documentElement)
       .getPropertyValue('--chart-bar').trim() || '#666';
 
-    // D3 chart dimensions and margins
+    // D3 chart setup
     const margin = { top: 20, right: 20, bottom: 60, left: 60 };
     const width = 500 - margin.left - margin.right;
     const height = 300 - margin.top - margin.bottom;
 
-    // create SVG using D3
     const svg = d3.select(svgRef.current)
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom);
@@ -109,7 +107,7 @@ const ChartCard = ({ entries = [] }) => {
     const g = svg.append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // D3 scales for data mapping
+    // Scales for positioning
     const xScale = d3.scaleBand()
       .domain(data.map(d => d.symptom))
       .range([0, width])
@@ -119,7 +117,7 @@ const ChartCard = ({ entries = [] }) => {
       .domain([0, d3.max(data, d => d.count)])
       .range([height, 0]);
 
-    // create bars
+    // Draw the bars
     g.selectAll(".bar")
       .data(data)
       .enter().append("rect")
@@ -130,6 +128,7 @@ const ChartCard = ({ entries = [] }) => {
       .attr("height", d => height - yScale(d.count))
       .attr("fill", chartBarColor); 
 
+    // X axis (symptom names)
     g.append("g")
       .attr("transform", `translate(0,${height})`)
       .call(d3.axisBottom(xScale))
@@ -140,6 +139,7 @@ const ChartCard = ({ entries = [] }) => {
       .attr("transform", "rotate(-45)")
       .style("font-size", "10px");
 
+    // Y axis (counts)
     g.append("g")
       .call(d3.axisLeft(yScale));
   }, [entries, themeChangeKey]); 

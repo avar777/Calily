@@ -52,6 +52,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
     }
   };
 
+  // Draw the D3 graph when we get new data
   useEffect(() => {
     if (trendData && trendData.dailyScores && svgRef.current) {
       drawGraph();
@@ -60,7 +61,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
 
   const drawGraph = () => {
     const svg = d3.select(svgRef.current);
-    svg.selectAll('*').remove();
+    svg.selectAll('*').remove(); // Clear the old graph
 
     const margin = { top: 20, right: 30, bottom: 50, left: 50 };
     const width = svgRef.current.clientWidth - margin.left - margin.right;
@@ -77,7 +78,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
       date: new Date(d.date)
     }));
 
-    // X scale
+    // X scale (dates)
     const x = d3.scaleTime()
       .domain(d3.extent(data, d => d.date))
       .range([0, width]);
@@ -93,7 +94,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
       .y(d => y(d.score))
       .curve(d3.curveMonotoneX);
 
-    // Add grid lines
+    // Add grid lines so it's easier to read
     g.append('g')
       .attr('class', 'grid')
       .attr('opacity', 0.1)
@@ -102,7 +103,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
         .tickFormat('')
       );
 
-    // Add gradient for area under curve
+    // Gradient for the area under the curve
     const gradient = svg.append('defs')
       .append('linearGradient')
       .attr('id', 'area-gradient')
@@ -121,7 +122,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
       .attr('stop-color', 'var(--primary-color)')
       .attr('stop-opacity', 0.05);
 
-    // Add area under curve
+    // Area under the curve
     const area = d3.area()
       .x(d => x(d.date))
       .y0(height)
@@ -133,7 +134,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
       .attr('fill', 'url(#area-gradient)')
       .attr('d', area);
 
-    // Add line
+    // The actual line
     g.append('path')
       .datum(data)
       .attr('fill', 'none')
@@ -141,7 +142,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
       .attr('stroke-width', 3)
       .attr('d', line);
 
-    // Add dots
+    // Data point dots
     g.selectAll('.dot')
       .data(data)
       .enter()
@@ -160,7 +161,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
           .duration(200)
           .attr('r', 8);
 
-        // Tooltip
+        // Show tooltip on hover
         const tooltip = g.append('g')
           .attr('class', 'tooltip')
           .attr('transform', `translate(${x(d.date)},${y(d.score) - 20})`);
@@ -190,7 +191,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
         g.selectAll('.tooltip').remove();
       });
 
-    // X axis
+    // X axis (dates)
     g.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(x)
@@ -200,7 +201,7 @@ const AITrendGraph = ({ entries, medications = [] }) => {
       .selectAll('text')
       .attr('fill', 'var(--text-color)');
 
-    // Y axis
+    // Y axis (scores)
     g.append('g')
       .call(d3.axisLeft(y)
         .ticks(5)
@@ -221,10 +222,10 @@ const AITrendGraph = ({ entries, medications = [] }) => {
   const getTrendIcon = () => {
     if (!trendData) return '';
     switch (trendData.trendDirection) {
-      case 'improving': return '';
-      case 'declining': return '';
-      case 'stable': return '';
-      default: return '';
+      case 'improving': return '↗';
+      case 'declining': return '↘';
+      case 'stable': return '→';
+      default: return '→';
     }
   };
 

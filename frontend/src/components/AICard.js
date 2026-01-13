@@ -18,13 +18,13 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('summary');
   
-  // Date range selection
+  // Date range stuff
   const [dateRangeMode, setDateRangeMode] = useState('week'); // 'week', 'month', 'custom'
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showDateOptions, setShowDateOptions] = useState(false);
 
-  // Set default dates when component mounts
+  // Set up default dates on load
   useEffect(() => {
     const today = new Date();
     const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -33,10 +33,10 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
     setStartDate(sevenDaysAgo.toISOString().split('T')[0]);
   }, []);
 
-  // Note: Auto-generation removed to prevent stale insights
-  // Users must explicitly click "Generate Insights" button with their chosen date range
+  // No auto-generation - users pick their date range and hit the button
+  // Prevents showing stale data from last week
 
-  // Notify parent component when insights change
+  // Let parent component know when insights change
   useEffect(() => {
     if (onInsightsGenerated && (weeklySummary || patterns || triggers || doctorVisit)) {
       onInsightsGenerated({
@@ -52,7 +52,7 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
   // Filter entries by date range
   const filterEntriesByDateRange = (start, end) => {
     const startTime = new Date(start).getTime();
-    const endTime = new Date(end).getTime() + 86400000; // Add 24 hours to include end date
+    const endTime = new Date(end).getTime() + 86400000; // Add 24 hours so we include the end date
     
     return entries.filter(entry => {
       const entryTime = new Date(entry.createdAt).getTime();
@@ -68,7 +68,7 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
       let filteredEntries = entries;
       let dateRange = { start: '', end: '' };
 
-      // Apply date filtering based on mode
+      // Figure out which date range mode they picked
       if (dateRangeMode === 'week') {
         const today = new Date();
         const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -111,7 +111,7 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
         return;
       }
 
-      // Generate all insights in parallel
+      // Hit all the AI endpoints at once
       const [summary, patternAnalysis, triggerAnalysis, doctorPrep] = await Promise.all([
         aiService.generateWeeklySummary(filteredEntries),
         aiService.analyzePatterns(filteredEntries),
@@ -119,7 +119,7 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
         aiService.prepareDoctorVisit(filteredEntries, medications)
       ]);
 
-      // Add date range to summary
+      // Attach date range to summary
       if (summary) {
         summary.dateRange = dateRange;
       }
@@ -137,7 +137,7 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
     }
   };
 
-  // Formatting function for all AI text
+  // Takes AI markdown text and turns it into nice formatted sections
   const formatAIText = (text) => {
     if (!text) return [];
     
@@ -148,9 +148,9 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
     lines.forEach((line, index) => {
       const trimmed = line.trim();
       
-      // Check for headers (bold text with ** or ## or #)
+      // Looking for headers (bolded or ## or #)
       if (trimmed.match(/^\*\*(.+?)\*\*:?/) || trimmed.startsWith('##') || trimmed.startsWith('# ')) {
-        // Push any accumulated list items first
+        // Push any list items we've collected first
         if (currentList.length > 0) {
           formatted.push({ type: 'list', items: currentList });
           currentList = [];
@@ -165,17 +165,17 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
           headerText = trimmed.replace(/^#\s*/, '').trim();
         }
         
-        // Remove any remaining ** markers
+        // Clean up any leftover ** markers
         headerText = headerText.replace(/\*\*/g, '');
         formatted.push({ type: 'header', text: headerText, key: `header-${index}` });
       }
-      // Check for bullet points (*, -, Ã¢â‚¬Â¢)
-      else if (trimmed.match(/^[\*\-Ã¢â‚¬Â¢]\s/)) {
-        const bulletText = trimmed.replace(/^[\*\-Ã¢â‚¬Â¢]\s/, '').trim();
+      // Bullet points (*, -, •)
+      else if (trimmed.match(/^[\*\-•]\s/)) {
+        const bulletText = trimmed.replace(/^[\*\-•]\s/, '').trim();
         const cleanBulletText = bulletText.replace(/\*\*/g, '');
         currentList.push(cleanBulletText);
       }
-      // Check for numbered lists
+      // Numbered lists
       else if (/^\d+\.\s/.test(trimmed)) {
         const numberText = trimmed.replace(/^\d+\.\s/, '').trim();
         const cleanNumberText = numberText.replace(/\*\*/g, '');
@@ -183,7 +183,7 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
       }
       // Regular paragraph text
       else if (trimmed) {
-        // Push any accumulated list items first
+        // Push any list items first
         if (currentList.length > 0) {
           formatted.push({ type: 'list', items: currentList });
           currentList = [];
@@ -194,7 +194,7 @@ const AIInsightsCard = ({ entries, medications = [], onInsightsGenerated }) => {
       }
     });
 
-    // Push any remaining list items
+    // Don't forget any remaining list items
     if (currentList.length > 0) {
       formatted.push({ type: 'list', items: currentList });
     }

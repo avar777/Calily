@@ -19,11 +19,11 @@ const MedCard = () => {
     frequency: 'Daily',
     timeOfDay: 'Morning',
     notes: '',
-    trackOnly: false  // NEW: Just track vs daily checklist
+    trackOnly: false  // Just track vs daily reminders
   });
   const [error, setError] = useState(null);
 
-  // Load medications on mount
+  // Load meds when component loads
   useEffect(() => {
     fetchMedications();
   }, []);
@@ -64,7 +64,7 @@ const MedCard = () => {
     }
   };
 
-  // Get which doses to show based on frequency
+  // Figure out which doses to show based on frequency
   const getDoseTimes = (frequency) => {
     switch(frequency) {
       case 'Twice Daily':
@@ -120,7 +120,7 @@ const MedCard = () => {
   return (
     <div className="card med-card">
       <div className="card-header">
-        <h2> Medications</h2>
+        <h2>💊 Medications</h2>
         {!isAdding && (
           <button 
             onClick={() => setIsAdding(true)} 
@@ -191,7 +191,7 @@ const MedCard = () => {
               <span>Only track (no daily reminders)</span>
             </label>
             <small className="track-only-hint">
-              Check this if you just want to track your medication without daily reminders
+              Check this if you just want to track your medication without daily checkboxes
             </small>
           </div>
 
@@ -247,10 +247,10 @@ const MedCard = () => {
                   <div className="med-details">
                     {med.frequency}
                     {med.notes && ` • ${med.notes}`}
-                    {med.trackOnly && <span className="track-only-badge"> </span>}
+                    {med.trackOnly && <span className="track-only-badge"> 📋</span>}
                   </div>
 
-                  {/* Multiple Dose Checkboxes - Only show if NOT track-only */}
+                  {/* Multiple Dose Checkboxes - only show if NOT track-only */}
                   {!med.trackOnly && (
                     <div className="med-doses">
                       {doseTimes.map((doseTime) => (

@@ -9,14 +9,13 @@
 import React, { useState, useRef } from 'react';
 
 const EntryCard = ({ onAddEntry }) => {
-  // state for entry text input
   const [entryText, setEntryText] = useState('');
   const [imagePreview, setImagePreview] = useState(null);
   const [imageData, setImageData] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Expanded word bank with emotions (kept for future autocomplete/suggestions)
-  // Not shown to user, but available for backend processing or future features
+  // Word bank for future autocomplete feature - not using it yet but it's here
+  // Backend might want this later for better AI analysis
   const wordBank = [
     // Physical symptoms
     'fatigue', 'tired', 'exhausted', 'pain', 'ache', 'headache', 'migraine',
@@ -54,19 +53,19 @@ const EntryCard = ({ onAddEntry }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
+    // Make sure it's actually an image
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file');
       return;
     }
 
-    // Validate file size (5MB limit)
+    // Keep it under 5MB
     if (file.size > 5 * 1024 * 1024) {
       alert('Image size must be less than 5MB');
       return;
     }
 
-    // Read file as base64
+    // Convert to base64 so we can store it
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result;
@@ -88,13 +87,11 @@ const EntryCard = ({ onAddEntry }) => {
     }
   };
 
-  // this will handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     if (entryText.trim()) {
-      // send entry with optional image to parent component
       onAddEntry(entryText.trim(), imageData);
-      // clear input after submission
+      // Clear everything after submission
       setEntryText('');
       handleRemoveImage();
     }
@@ -112,7 +109,7 @@ const EntryCard = ({ onAddEntry }) => {
           rows="3"
         />
 
-        {/* Image Preview */}
+        {/* Show image preview if they uploaded one */}
         {imagePreview && (
           <div style={{ 
             position: 'relative', 
@@ -157,7 +154,7 @@ const EntryCard = ({ onAddEntry }) => {
           </div>
         )}
 
-        {/* Image Upload Button */}
+        {/* Image upload button */}
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
           <input
             ref={fileInputRef}
@@ -185,7 +182,7 @@ const EntryCard = ({ onAddEntry }) => {
             onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(0,0,0,0.05)'}
             onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--card-bg)'}
           >
-             {imagePreview ? 'Change Photo' : 'Add Photo'}
+            📷 {imagePreview ? 'Change Photo' : 'Add Photo'}
           </label>
         </div>
 

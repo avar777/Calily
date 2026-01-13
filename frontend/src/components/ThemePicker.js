@@ -41,7 +41,7 @@ const ThemePicker = () => {
       deleteBtn: '#83bdf3ff',
       deleteBtnText: '#ffffff',
       chartBar: '#83bdf3ff',
-      entryBorder: '#83bdf3ff',
+      entryBorder: '#d98572',
       setting: '#a1a1a1ff'
     },
     {
@@ -57,7 +57,7 @@ const ThemePicker = () => {
       deleteBtn: '#83bdf3ff',
       deleteBtnText: '#ffffff',
       chartBar: '#83bdf3ff',
-      entryBorder: '#83bdf3ff',
+      entryBorder: '#d98572',
       setting: '#474747ff'
     }
   ];
@@ -79,12 +79,15 @@ const ThemePicker = () => {
     root.style.setProperty('--entry-border', theme.entryBorder);
     root.style.setProperty('--setting-button-color', theme.setting);
     
+    // Let other components know the theme changed
     window.dispatchEvent(new CustomEvent('themeChanged'));
     
+    // Save to localStorage so it persists
     localStorage.setItem('calily-theme', JSON.stringify(theme));
     setShowPicker(false);
   };
 
+  // Load saved theme on mount
   useEffect(() => {
     const savedTheme = localStorage.getItem('calily-theme');
     if (savedTheme) {
@@ -103,6 +106,7 @@ const ThemePicker = () => {
         onClick={() => setShowPicker(!showPicker)}
         title="Change theme"
       >
+        🎨
       </button>
       {showPicker && (
         <div className="theme-dropdown">

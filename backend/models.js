@@ -1,6 +1,6 @@
 /*
  * Calily
- * Mongoose definition with tagging and search
+ * Mongoose schemas with tagging and search
  *
  * Author: Ava Raper
  * Version: 1.0
@@ -65,9 +65,9 @@ const entrySchema = new mongoose.Schema({
     maxlength: [1000, 'Entry cannot exceed 1000 characters']
   },
   image: {
-    data: String,  // Base64 encoded image data
-    contentType: String,  // Image MIME type (e.g., 'image/jpeg', 'image/png')
-    filename: String  // Original filename
+    data: String,  // Base64 encoded image
+    contentType: String,  // image/jpeg, image/png, etc.
+    filename: String
   },
   tags: [{
     type: String,
@@ -84,13 +84,16 @@ const entrySchema = new mongoose.Schema({
   }
 });
 
+// Set up indexes for better performance
 entrySchema.index({ text: 'text' }); // full-text search 
 entrySchema.index({ createdAt: -1 }); // sort by date
 entrySchema.index({ userId: 1, createdAt: -1 }); // user entries sorted by date
 
-// tagging system for health keywords
+// Auto-tag entries with health keywords before saving
 entrySchema.pre('save', function(next) {
   this.updatedAt = new Date();
+  
+  // Health keyword list for auto-tagging
   const healthKeywords = [
     'fatigue', 'tired', 'exhausted', 'weak', 'weakness', 'energy', 'drained',
     'pain', 'ache', 'aches', 'sore', 'tender', 'burning', 'sharp pain', 'throbbing',
@@ -116,22 +119,23 @@ entrySchema.pre('save', function(next) {
     'weather', 'rain', 'cold weather', 'hot weather', 'humidity',
     'family', 'friends', 'social', 'alone', 'busy', 'relaxing'
   ];
-  // search entry text for health keywords
+  
+  // Find keywords in the entry text
   const textLower = this.text.toLowerCase();
   this.tags = healthKeywords.filter(keyword => textLower.includes(keyword));
   next();
 });
 
-// advance search across text and tags
+// Search across text and tags (user-specific)
 entrySchema.statics.searchEntries = function(searchTerm, userId) {
-  const regex = new RegExp(searchTerm, 'i'); // case insensitive search 
+  const regex = new RegExp(searchTerm, 'i'); // case insensitive
   return this.find({
-    userId: userId,  // Only search user's own entries
+    userId: userId,  // Only search this user's entries
     $or: [
-      { text: regex }, // search in entry text
+      { text: regex }, // search in text
       { tags: { $in: [regex] } } // search in tags 
     ]
-  }).sort({ createdAt: -1 }); // sort by newest to last
+  }).sort({ createdAt: -1 }); // newest first
 };
 
 const Entry = mongoose.model('Entry', entrySchema);
@@ -170,10 +174,10 @@ const medicationSchema = new mongoose.Schema({
   },
   trackOnly: {
     type: Boolean,
-    default: false  // false = show checkboxes, true = just list the med
+    default: false  // false = show checkboxes, true = just list it
   },
   takenDoses: [{
-    type: String  // Store as 'YYYY-MM-DD-Morning', 'YYYY-MM-DD-Evening', etc.
+    type: String  // Format: 'YYYY-MM-DD-Morning', 'YYYY-MM-DD-Evening', etc.
   }],
   createdAt: {
     type: Date,
@@ -185,7 +189,8 @@ const medicationSchema = new mongoose.Schema({
   }
 });
 
-medicationSchema.index({ userId: 1, createdAt: -1 }); // user medications sorted by date
+// Index for better performance
+medicationSchema.index({ userId: 1, createdAt: -1 });
 
 medicationSchema.pre('save', function(next) {
   this.updatedAt = new Date();

@@ -36,7 +36,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
       deleteBtn: '#d98572',
       deleteBtnText: '#ffffff',
       chartBar: '#7a9b7f',
-      entryBorder: '#7a9b7f',
+      entryBorder: '#d98572',
       setting: '#d4c5b0'
     },
     {
@@ -52,7 +52,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
       deleteBtn: '#83bdf3ff',
       deleteBtnText: '#ffffff',
       chartBar: '#83bdf3ff',
-      entryBorder: '#000000',
+      entryBorder: '#d98572',
       setting: '#a1a1a1ff'
     },
     {
@@ -68,7 +68,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
       deleteBtn: '#83bdf3ff',
       deleteBtnText: '#ffffff',
       chartBar: '#83bdf3ff',
-      entryBorder: '#000000',
+      entryBorder: '#d98572',
       setting: '#474747ff'
     }
   ];
@@ -92,6 +92,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
     root.style.setProperty('--entry-border', theme.entryBorder);
     root.style.setProperty('--setting-button-color', theme.setting);
     
+    // Let other components know
     window.dispatchEvent(new CustomEvent('themeChanged'));
     localStorage.setItem('calily-theme', JSON.stringify(theme));
   };
@@ -132,6 +133,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
         setNewPassword('');
         setConfirmPassword('');
         
+        // Clear success message after a bit
         setTimeout(() => {
           setSuccess('');
         }, 3000);

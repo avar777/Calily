@@ -17,7 +17,7 @@ const ExportCard = ({ entries, aiInsights }) => {
   const [entriesStartDate, setEntriesStartDate] = useState('');
   const [entriesEndDate, setEntriesEndDate] = useState('');
 
-  // Set default dates when component mounts
+  // Set default dates on load
   useEffect(() => {
     const today = new Date();
     const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -42,12 +42,12 @@ const ExportCard = ({ entries, aiInsights }) => {
     });
   };
 
-  // Export entries to text file
+  // Export entries as plain text file
   const exportToText = () => {
     let filteredEntries = entries;
     let dateRangeText = '';
 
-    // Apply date filtering based on mode
+    // Figure out which date range they picked
     if (entriesExportMode === 'week') {
       const today = new Date();
       const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -78,7 +78,7 @@ const ExportCard = ({ entries, aiInsights }) => {
       return `${date} ${time}: ${entry.text}`;
     }).join('\n\n');
 
-    // Create export summary
+    // Create the export file
     let summary = `CALILY JOURNAL EXPORT: ${new Date().toLocaleDateString()}\n`;
     summary += `Date Range: ${dateRangeText}\n`;
     summary += `Total Entries: ${filteredEntries.length}\n\n`;
@@ -89,7 +89,7 @@ const ExportCard = ({ entries, aiInsights }) => {
       summary += textData;
     }
 
-    // Create downloadable blob
+    // Turn it into a downloadable file
     const dataBlob = new Blob([summary], { type: 'text/plain' });
     const url = URL.createObjectURL(dataBlob);
 
@@ -104,7 +104,7 @@ const ExportCard = ({ entries, aiInsights }) => {
     URL.revokeObjectURL(url);
   };
 
-  // Export with current insights (from AIInsightsCard)
+  // Export with the current AI insights that are showing
   const exportWithCurrentInsights = () => {
     if (!aiInsights || (!aiInsights.weeklySummary && !aiInsights.patterns && !aiInsights.triggers)) {
       alert('Please generate AI insights first before exporting.');
@@ -113,13 +113,7 @@ const ExportCard = ({ entries, aiInsights }) => {
 
     const { weeklySummary, patterns, triggers, doctorVisit, dateRange } = aiInsights;
     
-    // Warn if insights date range doesn't match typical export scenarios
-    if (dateRange && dateRange.start && dateRange.end) {
-      const insightText = `The AI insights were generated for: ${dateRange.start} - ${dateRange.end}\n\nThe exported journal entries will match this same date range.`;
-      console.log(insightText);
-    }
-
-    // Determine date range text
+    // Figure out the date range text
     let dateRangeText = 'Generated Insights';
     if (dateRange && dateRange.start && dateRange.end) {
       dateRangeText = `${dateRange.start} - ${dateRange.end}`;
@@ -134,21 +128,21 @@ const ExportCard = ({ entries, aiInsights }) => {
       filteredEntries = filterEntriesByDateRange(startISO, endISO);
     }
 
-    // Format filtered entries
+    // Format the entries
     const textData = filteredEntries.map(entry => {
       const date = new Date(entry.createdAt).toLocaleDateString();
       const time = new Date(entry.createdAt).toLocaleTimeString();
       return `${date} ${time}: ${entry.text}`;
     }).join('\n\n');
 
-    // Build the complete export
+    // Build the complete export file
     let fullExport = `CALILY JOURNAL EXPORT WITH AI INSIGHTS\n`;
     fullExport += `Export Date: ${new Date().toLocaleDateString()}\n`;
     fullExport += `Insights Date Range: ${dateRangeText}\n`;
     fullExport += `Total Entries: ${filteredEntries.length}\n\n`;
     fullExport += `${'='.repeat(60)}\n\n`;
 
-    // Add AI insights section
+    // Add all the AI insights
     fullExport += `AI HEALTH INSIGHTS\n`;
     fullExport += `${'='.repeat(60)}\n\n`;
 
@@ -188,7 +182,7 @@ const ExportCard = ({ entries, aiInsights }) => {
       }
     }
 
-    // Doctor Visit Preparation
+    // Doctor Visit Prep
     if (doctorVisit) {
       fullExport += `DOCTOR VISIT PREPARATION\n`;
       fullExport += `${'-'.repeat(60)}\n`;
@@ -206,7 +200,7 @@ const ExportCard = ({ entries, aiInsights }) => {
 
     fullExport += `${'='.repeat(60)}\n\n`;
 
-    // Add journal entries
+    // Add the journal entries
     fullExport += `JOURNAL ENTRIES (${filteredEntries.length})\n`;
     fullExport += `${'='.repeat(60)}\n\n`;
     
@@ -216,12 +210,12 @@ const ExportCard = ({ entries, aiInsights }) => {
       fullExport += textData;
     }
 
-    // Add disclaimer
+    // Disclaimer
     fullExport += `\n\n${'='.repeat(60)}\n`;
     fullExport += `\nDISCLAIMER: AI insights are observations only, not medical advice.\n`;
     fullExport += `Always consult your healthcare provider for medical decisions.\n`;
 
-    // Create downloadable blob
+    // Make it downloadable
     const dataBlob = new Blob([fullExport], { type: 'text/plain' });
     const url = URL.createObjectURL(dataBlob);
 
@@ -260,7 +254,7 @@ const ExportCard = ({ entries, aiInsights }) => {
           }}
           onClick={() => setShowEntriesOptions(!showEntriesOptions)}
           >
-            <strong> Download Entries Only</strong>
+            <strong>📄 Download Entries Only</strong>
             <span style={{ fontSize: '1.2rem', color: 'var(--text-color)' }}>
               {showEntriesOptions ? '▼' : '▶'}
             </span>
@@ -391,7 +385,7 @@ const ExportCard = ({ entries, aiInsights }) => {
           }}
           onClick={() => setShowInsightsOptions(!showInsightsOptions)}
           >
-            <strong> Download with Current AI Insights</strong>
+            <strong>🧠 Download with Current AI Insights</strong>
             <span style={{ fontSize: '1.2rem', color: 'var(--text-color)' }}>
               {showInsightsOptions ? '▼' : '▶'}
             </span>
@@ -407,9 +401,8 @@ const ExportCard = ({ entries, aiInsights }) => {
                 fontSize: '0.9rem'
               }}>
                 <p style={{ margin: 0 }}>
-                  This will export the insights currently displayed in the AI Health Insights card above. 
-                  Select your desired date range in the AI Insights section, generate the insights, 
-                  then download them here.
+                  This'll export whatever insights are currently showing in the AI Health Insights card above. 
+                  Pick your date range there, generate the insights, then download them here.
                 </p>
               </div>
 

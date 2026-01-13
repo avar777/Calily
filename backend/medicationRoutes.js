@@ -3,13 +3,13 @@
  * Backend API routes for medication tracking
  * 
  * Author: Ava Raper
- * Version: 2.0 - Added toggle-dose endpoint
+ * Version: 2.0 - Added toggle-dose endpoint for multiple doses per day
  */
 const express = require('express');
 const router = express.Router();
 const { Medication } = require('./models');
 
-// GET all medications for logged-in user
+// GET all medications for this user
 router.get('/medications', async (req, res) => {
   try {
     const medications = await Medication.find({ userId: req.user._id })
@@ -38,7 +38,7 @@ router.post('/medications', async (req, res) => {
       timeOfDay: timeOfDay || 'Morning',
       notes: notes?.trim() || '',
       trackOnly: trackOnly || false,
-      takenDoses: []  // Initialize empty array for dose tracking
+      takenDoses: []  // Start with empty array
     });
 
     await medication.save();
@@ -49,7 +49,7 @@ router.post('/medications', async (req, res) => {
   }
 });
 
-// PUT toggle specific dose (NEW ENDPOINT - supports multiple doses per day)
+// PUT toggle specific dose (supports multiple doses per day)
 router.put('/medications/:id/toggle-dose', async (req, res) => {
   try {
     const { doseKey, taken } = req.body;
@@ -63,18 +63,18 @@ router.put('/medications/:id/toggle-dose', async (req, res) => {
       return res.status(404).json({ error: 'Medication not found' });
     }
 
-    // Initialize takenDoses if it doesn't exist
+    // Make sure takenDoses array exists
     if (!medication.takenDoses) {
       medication.takenDoses = [];
     }
 
     if (taken) {
-      // Add dose if not already present
+      // Add this dose if it's not already there
       if (!medication.takenDoses.includes(doseKey)) {
         medication.takenDoses.push(doseKey);
       }
     } else {
-      // Remove dose
+      // Remove this dose
       medication.takenDoses = medication.takenDoses.filter(d => d !== doseKey);
     }
 
@@ -86,7 +86,7 @@ router.put('/medications/:id/toggle-dose', async (req, res) => {
   }
 });
 
-// PUT toggle medication taken status for a specific date (OLD ENDPOINT - kept for backwards compatibility)
+// PUT toggle medication for a date (old endpoint - kept for backwards compatibility)
 router.put('/medications/:id/toggle', async (req, res) => {
   try {
     const { date, taken } = req.body;
@@ -100,18 +100,16 @@ router.put('/medications/:id/toggle', async (req, res) => {
       return res.status(404).json({ error: 'Medication not found' });
     }
 
-    // Initialize takenDates if it doesn't exist (backwards compatibility)
+    // Make sure takenDates exists (for backwards compatibility)
     if (!medication.takenDates) {
       medication.takenDates = [];
     }
 
     if (taken) {
-      // Add date if not already present
       if (!medication.takenDates.includes(date)) {
         medication.takenDates.push(date);
       }
     } else {
-      // Remove date
       medication.takenDates = medication.takenDates.filter(d => d !== date);
     }
 

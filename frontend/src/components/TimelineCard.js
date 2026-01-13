@@ -18,7 +18,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
   const [expandedImage, setExpandedImage] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Expanded word bank with emotions (kept in code for future use)
+  // Word bank for future use (autocomplete, etc.)
   const wordBank = [
     'fatigue', 'tired', 'exhausted', 'pain', 'ache', 'headache', 'migraine',
     'dizzy', 'nausea', 'nauseous', 'brain fog', 'foggy', 'weak', 'tremor',
@@ -39,7 +39,6 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
     'studying', 'socializing', 'inactive', 'active', 'busy'
   ];
 
-  // utility function for date formatting
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
@@ -82,7 +81,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
     }
   };
 
-  // Start editing mode
+  // Enter edit mode for an entry
   const startEdit = (entry) => {
     setEditingId(entry._id);
     setEditText(entry.text);
@@ -104,7 +103,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
     setRemoveImageFlag(false);
   };
 
-  // Save edited entry
+  // Save the edited entry
   const saveEdit = async (entryId) => {
     if (!editText.trim()) {
       alert('Entry cannot be empty');
@@ -237,7 +236,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
                         display: 'inline-block'
                       }}
                     >
-                       {editImagePreview && !removeImageFlag ? 'Change Photo' : 'Add Photo'}
+                      📷 {editImagePreview && !removeImageFlag ? 'Change Photo' : 'Add Photo'}
                     </label>
                   </div>
 
@@ -261,7 +260,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
               ) : (
                 // View mode
                 <>
-                  {/* Entry Image Display */}
+                  {/* Show entry image if there is one */}
                   {entry.image && entry.image.data && (
                     <div 
                       style={{ 
@@ -290,7 +289,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
                   <div className="entry-footer">
                     <div className="entry-date">{formatDate(entry.createdAt)}</div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                      {/* Edit icon button */}
+                      {/* Edit icon */}
                       <button
                         className="icon-btn"
                         onClick={() => startEdit(entry)}
@@ -324,7 +323,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
                         <span className="tooltip">Edit</span>
                       </button>
                       
-                      {/* Delete/Trash icon button */}
+                      {/* Delete icon */}
                       <button
                         className="icon-btn"
                         onClick={() => handleDelete(entry._id)}
@@ -368,7 +367,7 @@ const TimelineCard = ({ entries, onEntryDeleted, onEntryUpdated }) => {
         )}
       </div>
 
-      {/* Image Lightbox Modal */}
+      {/* Image lightbox for viewing full-size images */}
       {expandedImage && (
         <div 
           style={{

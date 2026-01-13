@@ -9,7 +9,7 @@ const express = require('express');
 const router = express.Router();
 const { Entry } = require('./models');
 
-// GET all entries - only user's entries
+// GET all entries - only this user's entries
 router.get('/entries', async (req, res) => {
   try {
     const entries = await Entry.find({ userId: req.userId })
@@ -35,9 +35,9 @@ router.post('/entries', async (req, res) => {
       text: text.trim()
     };
 
-    // Add image if provided
+    // Add image if they uploaded one
     if (image && image.data) {
-      // Validate image size (limit to 5MB base64)
+      // Keep images under 5MB
       const base64Size = image.data.length * 0.75 / 1024 / 1024; // Convert to MB
       if (base64Size > 5) {
         return res.status(400).json({ error: 'Image size must be less than 5MB' });
@@ -59,17 +59,7 @@ router.post('/entries', async (req, res) => {
   }
 });
 
-// this will get - all entries periodical
-router.get('/entries', async (req, res) => {
-  try {
-    const entries = await Entry.find().sort({ createdAt: -1 }).limit(100);
-    res.json(entries);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch entries' });
-  }
-});
-
-// this will get - single entry by ID
+// GET single entry by ID
 router.get('/entries/:id', async (req, res) => {
   try {
     const entry = await Entry.findById(req.params.id);
@@ -84,7 +74,7 @@ router.get('/entries/:id', async (req, res) => {
   }
 });
 
-// this will put - update existing entry
+// PUT update existing entry
 router.put('/entries/:id', async (req, res) => {
   try {
     const { text, image, removeImage } = req.body;
@@ -95,11 +85,11 @@ router.put('/entries/:id', async (req, res) => {
 
     const updateData = { text: text.trim() };
 
-    // Handle image removal
+    // Remove image if they want to
     if (removeImage) {
       updateData.image = undefined;
     }
-    // Handle image update/addition
+    // Or update/add a new image
     else if (image && image.data) {
       const base64Size = image.data.length * 0.75 / 1024 / 1024;
       if (base64Size > 5) {
@@ -130,7 +120,7 @@ router.put('/entries/:id', async (req, res) => {
   }
 });
 
-// this will delete - entry by ID
+// DELETE entry by ID
 router.delete('/entries/:id', async (req, res) => {
   try {
     const entry = await Entry.findByIdAndDelete(req.params.id);
@@ -145,7 +135,7 @@ router.delete('/entries/:id', async (req, res) => {
   }
 });
 
-// this will get - search entries by text/tags (user-specific)
+// GET search entries by text/tags (user-specific)
 router.get('/search', async (req, res) => {
   try {
     const { q } = req.query;
@@ -154,7 +144,7 @@ router.get('/search', async (req, res) => {
       return res.status(400).json({ error: 'Search query is required' });
     }
 
-    // Search only user's entries
+    // Only search this user's entries
     const entries = await Entry.searchEntries(q.trim(), req.userId);
     res.json(entries);
   } catch (error) {
@@ -163,15 +153,15 @@ router.get('/search', async (req, res) => {
   }
 });
 
-// this will get - symptom frequency data for bar chart
+// GET symptom frequency data for the chart
 router.get('/stats', async (req, res) => {
   try {
-    // use mongoDB for frequency analysis
+    // Use MongoDB aggregation to count tag frequency
     const tagAggregation = await Entry.aggregate([
-      { $unwind: '$tags' }, // seperate each tag
-      { $group: { _id: '$tags', count: { $sum: 1 } } }, // count 
-      { $sort: { count: -1 } }, // sort 
-      { $limit: 10 } // top 10 
+      { $unwind: '$tags' }, // Split out each tag
+      { $group: { _id: '$tags', count: { $sum: 1 } } }, // Count 'em
+      { $sort: { count: -1 } }, // Sort by most common
+      { $limit: 10 } // Top 10 only
     ]);
     const chartData = tagAggregation.map(item => ({
       symptom: item._id,
@@ -183,7 +173,7 @@ router.get('/stats', async (req, res) => {
   }
 });
 
-// this will get- the recent entries
+// GET recent entries
 router.get('/recent', async (req, res) => {
   try {
     const entries = await Entry.find().sort({ createdAt: -1 }).limit(5);
@@ -193,7 +183,7 @@ router.get('/recent', async (req, res) => {
   }
 });
 
-// this will get - to export all entries as .txt
+// GET export all entries as text
 router.get('/export', async (req, res) => {
   try {
     const entries = await Entry.find().sort({ createdAt: -1 });
